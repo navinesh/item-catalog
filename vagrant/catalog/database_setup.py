@@ -13,7 +13,7 @@ class Categories(Base):
 
 class Items(Base):
     __tablename__ = 'items'
-    
+
 
 engine = create_engine('')
 

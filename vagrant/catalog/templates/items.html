@@ -71,6 +71,22 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-md-4">
+          <p>{{ categories.name }}</p>
+        </div>
+        <div class="col-md-4">
+          {% for i in items %}
+          {{ i.name }}
+        </br>
+          {{ i.description }}
+          {% endfor %}
+        </div>
+        <div class="col-md-4">
+        <a href='{{url_for('newItem', categories_id=categories.id)}}'>Create new item</a>
+        </div>
+      </div>
+      <!--
       <h3>{{categories.name}}</h3>
       <a href='{{url_for('newItem', categories_id=categories.id)}}'>Create new item</a>
       </br></br>

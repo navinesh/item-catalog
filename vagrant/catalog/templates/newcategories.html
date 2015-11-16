@@ -4,11 +4,12 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>New scatalog</title>
+    <title>New Category</title>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="/static/main.css" type="text/css" />
+
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -16,25 +17,75 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.2/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <style>
+  		body
+  		{
+  			padding-top: 70px;
+  		}
+  	</style>
   </head>
   <body>
     <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container">
-        <ul class="nav nav-pills">
-          <li role="presentation" class="active"><a href="#">Item catalog</a></li>
-          <li role="presentation" class="navbar-right"><a href="#">Login</a></li>
-        </ul>
+        <div class="navbar-header">
+          <a class="navbar-brand active" href="/" >Item catalog</a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#hamburger-navigation">
+            <span class="sr-only">Navigation toggle</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="collapse navbar-collapse" id="hamburger-navigation">
+          <ul class="nav navbar-nav navbar-right" role="menu">
+            <li><a href="#loginModal" data-toggle="modal">Login</a></li>
+          </ul>
+        </div>
       </div>
     </nav>
 
     <div class="container">
-      <p>
-        {% for i in categories %}
-        {{ i.name }}
-        {% endfor %}
-      </p>
-    </div>
+      <div id="loginModal" class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <div class="modal-title text-center alert alert-info">Login</div>
+            </div>
+            <div class="modal-body">
+            <form class="form-horizontal" method="post" action="reset.php">
+              <div class="form-group has-feedback">
+                <label for="email" class="control-label col-md-2">
+                  Email:
+                </label>
+                <div class="col-md-8">
+                  <input type="email" name="uemail" id="uemail" required="required" class="form-control" placeholder="Email address" />
+                </div>
+                <span class="glyphicon form-control-feedback"></span>
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary col-xs-offset-1 col-xs-10 col-md-offset-2 col-md-8">Login</button>
+              </div>
+            </form>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <h3 class="text-center">New Category</h3>
+      <form class='form-horizontal' method='post' action='{{url_for('newCategories')}}'>
+        <div class="form-group has-feedback">
+          <label for="leave" class="control-label col-md-4">
+            Name
+          </label>
+          <div class="col-md-3">
+            <input type="text" name="name" id="name" required="required" class="form-control" autocomplete="off" placeholder="Enter name of category" />
+          </div>
+          <button type="submit" class="btn btn-primary">Create</button>
+          <a href='{{url_for('showCategories')}}' class='btn btn-warning' role='button'>Cancel</a>
+        </div>
+      </form>
+    </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Item catalog</title>
+    <title>New Category</title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css" />
@@ -20,7 +20,7 @@
     <style>
   		body
   		{
-  			padding-top: 50px;
+  			padding-top: 70px;
   		}
   	</style>
   </head>
@@ -28,7 +28,7 @@
     <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
-          <a class="navbar-brand active" href="#" >Item catalog</a>
+          <a class="navbar-brand active" href="/" >Item catalog</a>
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#hamburger-navigation">
             <span class="sr-only">Navigation toggle</span>
             <span class="icon-bar"></span>
@@ -71,12 +71,15 @@
           </div>
         </div>
       </div>
-      <h3>Categories</h3>
-      <h4>
-        {% for i in categories %}
-        <a href='{{url_for('showItems', categories_id=i.id)}}'>{{ i.name }} </a>
-        {% endfor %}
-      </h4>
+      <h3>{{categories.name}}</h3>
+      <a href='{{url_for('newItem', categories_id=categories.id)}}'>Create new item</a>
+      </br></br>
+      {% for i in items %}
+        <strong>{{ i.name }}</strong>
+        </br>
+        {{ i.description }}
+        </br>
+      {% endfor %}
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

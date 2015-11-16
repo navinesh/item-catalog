@@ -1,0 +1,23 @@
+/* navbar-default modified for custom style */
+.navbar{
+  	 background-color: #ffffff;
+}
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+	color: #0c7cd5;
+	box-shadow: 0 -3px inset;
+}
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active >
+ a:hover, .navbar-default .navbar-nav > .active > a:focus {
+	 color:#0c7cd5;
+}
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+	color:#0c7cd5;
+}
+.navbar-default .navbar-brand.active {
+    color: #0c7cd5;
+}
+.navbar-default .navbar-brand:hover{
+    color: #0c7cd5;
+	box-shadow: 0 -3px inset;
+}

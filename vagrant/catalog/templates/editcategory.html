@@ -72,25 +72,26 @@
           </div>
         </div>
       </div>
-
-      <h3 class="text-center">Edit category</h3>
-      <form class='form-horizontal' method='post' action='{{url_for('editCategory', category_id=i.id)}}'>
-        <div class="form-group has-feedback">
-          <label for="name" class="control-label col-md-4">
-            Name:
-          </label>
-          <div class="col-md-4">
-            <input type="text" name="name" id="name" required="required" class="form-control" value="{{ i.name }}" />
+      <div class="row">  
+        <h3 class="text-center">Edit category</h3>
+        <form class='form-horizontal' method='post' action='{{url_for('editCategory', category_id=i.id)}}'>
+          <div class="form-group has-feedback">
+            <label for="name" class="control-label col-xs-offset-1 col-xs-10 col-md-4">
+              Name:
+            </label>
+            <div class="col-xs-offset-1 col-xs-10 col-md-4">
+              <input type="text" name="name" id="name" required="required" class="form-control" value="{{ i.name }}" />
+            </div>
           </div>
-        </div>
-        <div class="form-group">
-          <button type="submit" class="btn btn-primary col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">Edit</button>
-        </div>
-        <div class="form-group">
-          <a href='{{url_for('showCategories')}}' class='btn btn-warning btn btn-primary col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4' role='button'>Cancel</a>
-        </div>
-      </form>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">Edit</button>
+          </div>
+          <div class="form-group">
+            <a href='{{url_for('showItems', category_id=i.id)}}' class='btn btn-warning btn btn-primary col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4' role='button'>Cancel</a>
+          </div>
+        </form>
       </div>
+    </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

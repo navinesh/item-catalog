@@ -28,7 +28,7 @@ class Items(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
     description = Column(String(250), nullable=False)
-    categories_id = Column(Integer, ForeignKey('categories.id'))
+    category_id = Column(Integer, ForeignKey('categories.id'))
     categories = relationship(Categories)
 
     @property
@@ -37,7 +37,7 @@ class Items(Base):
         'id' : self.id,
         'name' : self.name,
         'description' : self.description,
-        'categories_id' : self.categories_id
+        'category_id' : self.categories_id
         }
 
 engine = create_engine('postgresql:///itemcatalog')

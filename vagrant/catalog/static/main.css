@@ -1,12 +1,20 @@
 /** {
    font-size: 15px;
 }*/
-
-.btn-default {
+.btn-grey {
+  color: #3e3e3e;
+  border-color: #3e3e3e;
+}
+.btn-grey:hover, .btn-grey:active {
   color: #0c7cd5;
   border-color: #0c7cd5;
 }
-.btn-default:hover, .btn-primary:active {
+
+.btn-custom {
+  color: #0c7cd5;
+  border-color: #0c7cd5;
+}
+.btn-custom:hover, .btn-custom:focus {
   color: #0c7cd5;
   border-color: #0c7cd5;
   background-color: #ecf2f7;

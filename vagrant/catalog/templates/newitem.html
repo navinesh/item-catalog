@@ -20,7 +20,7 @@
     <style>
     body
     {
-      padding-top: 50px;
+      padding-top: 70px;
     }
     </style>
   </head>
@@ -72,29 +72,27 @@
           </div>
         </div>
       </div>
-
-      <h3 class="text-center">New Item</h3>
-      <form class='form-horizontal' method='post' action='{{url_for('newItem', categories_id=categories_id)}}'>
+      <h3>New item</h3>
+      <h3 class="text-center">{{ category_name }}</h3>
+      <form class='form-horizontal' method='post' action='{{url_for('newItem', category_id=category_id)}}'>
         <div class="form-group has-feedback">
-          <div class="col-xs-12 col-md-offset-4 col-md-3">
+          <div class="col-xs-12 col-md-offset-4 col-md-4">
             <input type="text" name="name" id="name" required="required" class="form-control" autocomplete="off" placeholder="Item name" />
           </div>
         </div>
         <div class="form-group has-feedback">
-          <div class="col-xs-12 col-md-offset-4 col-md-3">
+          <div class="col-xs-12 col-md-offset-4 col-md-4">
             <input type="text" name="description" id="description" required="required" class="form-control" autocomplete="off" placeholder="Item description" />
           </div>
-          <!--
-          <button type="submit" class="btn btn-primary">Create</button>
-          <a href='{{url_for('showItems', categories_id=categories_id)}}' class='btn btn-warning' role='button'>Cancel</a>
-        -->
         </div>
         <div class="form-group">
-          <div class="col-xs-12 col-md-offset-4 col-md-3">
-            <button type="submit" class="btn btn-primary">Create</button>
-            <a href='{{url_for('showItems', categories_id=categories_id)}}' class='btn btn-warning' role='button'>Cancel</a>
-          </div>
+          <button type="submit" class="btn btn-primary btn btn-primary col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">Create</button>
         </div>
+        <div class="form-group">
+          <a href='{{url_for('showItems', category_id=category_id)}}' class='btn btn-warning col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4' role='button'>Cancel</a>
+        </div>
+      </form>
+    </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

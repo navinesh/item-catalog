@@ -72,19 +72,24 @@
         </div>
       </div>
 
-      <h3 class="text-center">New Category</h3>
-      <form class='form-horizontal' method='post' action='{{url_for('newCategories')}}'>
-        <div class="form-group has-feedback">
-          <label for="leave" class="control-label col-md-4">
-            Name
-          </label>
-          <div class="col-md-3">
-            <input type="text" name="name" id="name" required="required" class="form-control" autocomplete="off" placeholder="Enter name of category" />
-          </div>
-          <button type="submit" class="btn btn-primary">Create</button>
-          <a href='{{url_for('showCategories')}}' class='btn btn-warning' role='button'>Cancel</a>
+      <div class="row">
+        <div class="col-md-12">
+          <h3>New category</h3>
         </div>
-      </form>
+      </div>
+        <form class='form-horizontal' method='post' action='{{url_for('newCategory')}}'>
+          <div class="form-group has-feedback">
+            <div class="col-xs-12 col-md-offset-4 col-md-4">
+              <input type="text" name="name" id="name" required="required" class="form-control" autocomplete="off" placeholder="Enter category name" />
+            </div>
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">Create</button>
+          </div>
+          <div class="form-group">
+            <a href='{{url_for('showCategories')}}' class='btn btn-warning col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4' role='button'>Cancel</a>
+          </div>
+        </form>
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

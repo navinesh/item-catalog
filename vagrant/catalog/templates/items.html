@@ -72,35 +72,21 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-4">
-          {{ categories.name }}
-        </div>
-        <div class="col-md-4">
+        <div class="col-md-offset-3 col-md-4">
+          <h3>{{ category.name }}</h3>
           {% for i in items %}
-          {{ i.name }}
+          <h4>{{ i.name }}</h4>
+          <i>Description:</i> {{ i.description }}
         </br>
-          {{ i.description }}
-        </br>
-        <a href='{{url_for('editItems', categories_id=categories.id, items_id=i.id)}}'>Edit menu</a>
-        </br>
-        <a href='{{url_for('deleteItems', categories_id=categories.id, items_id=i.id)}}'>Delete menu</a>
+        <a class="btn btn-default" href='{{url_for('editItem', category_id=category.id, items_id=i.id)}}', role="button">Edit</a>
+        <a class="btn btn-default" href='{{url_for('deleteItem', category_id=category.id, items_id=i.id)}}', role="button">Delete</a>
         </br></br>
           {% endfor %}
         </div>
         <div class="col-md-4">
-        <a href='{{url_for('newItem', categories_id=categories.id)}}'>Create new item</a>
+          <a class="btn btn-default" href='{{url_for('newItem', category_id=category.id)}}' role="button">Create new item</a>
         </div>
       </div>
-      <!--
-      <h3>{{categories.name}}</h3>
-      <a href='{{url_for('newItem', categories_id=categories.id)}}'>Create new item</a>
-      </br></br>
-      {% for i in items %}
-        <strong>{{ i.name }}</strong>
-        </br>
-        {{ i.description }}
-        </br>
-      {% endfor %}
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

@@ -66,7 +66,7 @@ def editItem(category_id, items_id):
         return render_template('edititem.html', category_id=category_id, i=editItem, c=categories)
 
 
-@app.route('/categories/<int:category_id>/<items_id>/edit', methods=['GET', 'POST'])
+@app.route('/categories/<int:category_id>/<items_id>/delete', methods=['GET', 'POST'])
 def deleteItem(category_id, items_id):
     """Delete item"""
     deleteItem = session.query(Items).filter_by(id=items_id).one()
@@ -75,7 +75,7 @@ def deleteItem(category_id, items_id):
         session.commit()
         return redirect(url_for('showItems', category_id=category_id))
     else:
-        return render_template('deleteItem.html')
+        return render_template('deleteItem.html', category_id=category_id, i=deleteItem)
 
 if __name__ == '__main__':
     app.debug = True

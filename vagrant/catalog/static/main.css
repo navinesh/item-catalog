@@ -1,3 +1,17 @@
+/** {
+   font-size: 15px;
+}*/
+
+.btn-default {
+  color: #0c7cd5;
+  border-color: #0c7cd5;
+}
+.btn-default:hover, .btn-primary:active {
+  color: #0c7cd5;
+  border-color: #0c7cd5;
+  background-color: #ecf2f7;
+}
+
 /* navbar-default modified for custom style */
 .navbar{
   	 background-color: #ffffff;

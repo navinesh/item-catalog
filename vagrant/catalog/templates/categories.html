@@ -76,6 +76,7 @@
           <h3>Categories</h3>
           {% for i in categories %}
           <a class="btn btn-grey" href='{{url_for('showItems', category_id=i.id)}}' role="button">{{ i.name }}</a>
+        </br></br>
           {% endfor %}
         </div>
         <div class="col-md-4">

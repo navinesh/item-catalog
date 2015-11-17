@@ -104,7 +104,7 @@ def deleteItem(category_id, items_id):
         session.commit()
         return redirect(url_for('showItems', category_id=category_id))
     else:
-        return render_template('deleteItem.html', category_id=category_id, i=deleteItem)
+        return render_template('deleteitem.html', category_id=category_id, i=deleteItem)
 
 if __name__ == '__main__':
     app.debug = True

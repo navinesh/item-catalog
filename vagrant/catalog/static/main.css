@@ -1,6 +1,13 @@
 /** {
    font-size: 15px;
 }*/
+.h-font{
+  font-size: 20px;
+}
+a:hover, a:focus {
+    color: #ff7a00;
+}
+
 .btn-grey {
   color: #3e3e3e;
   border-color: #3e3e3e;
@@ -15,11 +22,17 @@
   border-color: #0c7cd5;
 }
 .btn-custom:hover, .btn-custom:focus {
+  color: #fff;
+  background-color: #0c7cd5;
+  border-color: #0c7cd5;
+}
+/*
+.btn-custom:hover, .btn-custom:focus {
   color: #0c7cd5;
   border-color: #0c7cd5;
   background-color: #ecf2f7;
 }
-
+*/
 /* navbar-default modified for custom style */
 .navbar{
   	 background-color: #ffffff;

@@ -105,35 +105,31 @@ def deleteItem(category_id, items_id):
         return redirect(url_for('showItems', category_id=category_id))
     else:
         return render_template('deleteitem.html', category_id=category_id, i=deleteItem)
-<<<<<<< HEAD
-=======
 
 
-@app.route('/catalog/JSON/')
+@app.route('/catalog.json/')
 def catalogJSON():
     categories = session.query(Categories).all()
-    items = session.query(Items).all()
-    return jsonify(Categories=[i.serialize for i in categories])
+    return jsonify(Categories=[c.serialize for c in categories])
 
 
-@app.route('/categories/JSON/')
+@app.route('/categories/json/')
 def categoriesJSON():
     categories = session.query(Categories).all()
-    return jsonify(Categories=[i.serialize for i in categories])
+    return jsonify(Categories=[c.serialize for c in categories])
 
 
-@app.route('/categories/<int:category_id>/items/JSON/')
+@app.route('/categories/<int:category_id>/items/json/')
 def categoryItemJSON(category_id):
     items = session.query(Items).filter_by(category_id = category_id).all()
     return jsonify(Items=[i.serialize for i in items])
 
 
-@app.route('/categories/<int:category_id>/items/<int:items_id>/JSON/')
+@app.route('/categories/<int:category_id>/items/<int:items_id>/json/')
 def categoryItemsJSON(category_id, items_id):
     items = session.query(Items).filter_by(id = items_id).one()
     return jsonify(Items=[items.serialize])
 
->>>>>>> 60702d8a2df27392e3bd71ebaa966eb0fb0a2192
 
 if __name__ == '__main__':
     app.debug = True

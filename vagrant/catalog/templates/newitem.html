@@ -73,11 +73,6 @@
           </div>
         </div>
       </div>
-<<<<<<< HEAD
-      <div class="row">    
-        <h3>New item</h3>
-        <h3 class="text-center">{{ category_name }}</h3>
-=======
       <div class="row">
         <div class="col-md-offset-4 col-md-4">
           <h3>New item</h3>
@@ -85,27 +80,22 @@
       </div>
       <div class="row">
         <h3 class="col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">{{ category_name }}</h3>
->>>>>>> 60702d8a2df27392e3bd71ebaa966eb0fb0a2192
-        <form class='form-horizontal' method='post' action='{{url_for('newItem', category_id=category_id)}}'>
+        <form class='form-horizontal' method='post' enctype='multipart/form-data' action='{{url_for('newItem', category_id=category_id)}}'>
           <div class="form-group has-feedback">
             <div class="col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">
               <input type="text" name="name" id="name" required="required" class="form-control" autocomplete="off" placeholder="Item name" />
             </div>
-<<<<<<< HEAD
           </div>
           <div class="form-group has-feedback">
             <div class="col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">
               <input type="text" name="description" id="description" required="required" class="form-control" autocomplete="off" placeholder="Item description" />
             </div>
           </div>
-=======
-          </div>
           <div class="form-group has-feedback">
             <div class="col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">
               <input type="text" name="description" id="description" required="required" class="form-control" autocomplete="off" placeholder="Item description" />
             </div>
           </div>
->>>>>>> 60702d8a2df27392e3bd71ebaa966eb0fb0a2192
           <div class="form-group">
             <button type="submit" class="btn btn-primary btn btn-primary col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">Create</button>
           </div>
@@ -113,11 +103,7 @@
             <a href='{{url_for('showItems', category_id=category_id)}}' class='btn btn-warning col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4' role='button'>Cancel</a>
           </div>
         </form>
-<<<<<<< HEAD
-    </div>
-=======
       </div>
->>>>>>> 60702d8a2df27392e3bd71ebaa966eb0fb0a2192
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

@@ -21,7 +21,6 @@ class Categories(Base):
         'name' : self.name,
         }
 
-
 class Items(Base):
     __tablename__ = 'items'  # representation of table inside database
 
@@ -37,7 +36,6 @@ class Items(Base):
         'id' : self.id,
         'name' : self.name,
         'description' : self.description,
-        'category_id' : self.categories_id
         }
 
 engine = create_engine('postgresql:///itemcatalog')

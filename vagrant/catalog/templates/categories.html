@@ -72,11 +72,7 @@
         </div>
       </div>
       <div class="row">
-<<<<<<< HEAD
-        <div class="col-md-offset-1 col-md-10">
-=======
         <div class="col-md-offset-1 col-md-5">
->>>>>>> 60702d8a2df27392e3bd71ebaa966eb0fb0a2192
           <a class="btn btn-custom" href='{{url_for('newCategory')}}' role="button">Create new category</a>
         </div>
       </div>
@@ -84,25 +80,13 @@
         <div class="col-md-offset-1 col-md-5">
           <h3>Categories</h3>
           {% for i in categories %}
-<<<<<<< HEAD
-          <a class="btn btn-custom" href='{{url_for('showItems', category_id=i.id)}}' role="button">{{ i.name }}</a>
-        </br></br>
-=======
-          <!--<a class="btn btn-custom" href='{{url_for('showItems', category_id=i.id)}}' role="button">{{ i.name }}</a>-->
-          <a class="h-font" href='{{url_for('showItems', category_id=i.id)}}'>{{ i.name }}</a>
+          <a class="btn btn-grey" href='{{url_for('showItems', category_id=i.id)}}' role="button">{{ i.name }}</a>
           </br>
->>>>>>> 60702d8a2df27392e3bd71ebaa966eb0fb0a2192
           {% endfor %}
         </div>
         <div class="col-md-offset-1 col-md-5">
           <h3>Latest items</h3>
         </div>
-<<<<<<< HEAD
-        <!--<div class="col-md-2">
-          <a class="btn btn-custom" href='{{url_for('newCategory')}}' role="button">Create new category</a>
-        </div>-->
-=======
->>>>>>> 60702d8a2df27392e3bd71ebaa966eb0fb0a2192
       </div>
     </div>
 

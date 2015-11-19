@@ -1,14 +1,25 @@
-from flask import Flask, render_template, redirect, url_for, request, jsonify
-app = Flask(__name__)
+import os
+from flask import Flask, render_template, redirect, url_for, request, \
+     jsonify, send_from_directory
+from werkzeug import secure_filename
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Categories, Items
 
+# directory to store images
+UPLOAD_FOLDER = 'uploads/'
+# image extensions allowed to be uploaded
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 engine = create_engine('postgresql:///itemcatalog')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
 
 @app.route('/')
 @app.route('/categories/')
@@ -65,20 +76,33 @@ def showItems(category_id):
     return render_template('items.html', category=category, items=items)
 
 
+def allowed_file(filename):
+    """check if an image extension is allowed"""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
 @app.route('/categories/<int:category_id>/items/new/', methods=['GET', 'POST'])
 def newItem(category_id):
     """add new item for a particular category in the database"""
     category = session.query(Categories).filter_by(id=category_id).first()
     if request.method == 'POST':
-        newItem = Items(name=request.form['name'], category_id=category_id, description=request.form['description'])
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        newItem = Items(name=request.form['name'], category_id=category_id,
+                        description=request.form['description'], url=filename)
         session.add(newItem)
         session.commit()
         return redirect(url_for('showItems', category_id=category_id))
     else:
-        return render_template('newitem.html', category_id=category_id, category_name=category.name)
+        return render_template('newitem.html', category_id=category_id,
+                               category_name=category.name)
 
 
-@app.route('/categories/<int:category_id>/<items_id>/edit/', methods=['GET', 'POST'])
+@app.route('/categories/<int:category_id>/<items_id>/edit/',
+           methods=['GET', 'POST'])
 def editItem(category_id, items_id):
     """edit item of a particular category"""
     categories = session.query(Categories).all()
@@ -92,10 +116,12 @@ def editItem(category_id, items_id):
             session.commit()
             return redirect(url_for('showItems', category_id=category_id))
     else:
-        return render_template('edititem.html', category_id=category_id, i=editItem, c=categories)
+        return render_template('edititem.html', category_id=category_id,
+                               i=editItem, c=categories)
 
 
-@app.route('/categories/<int:category_id>/<items_id>/delete/', methods=['GET', 'POST'])
+@app.route('/categories/<int:category_id>/<items_id>/delete/',
+           methods=['GET', 'POST'])
 def deleteItem(category_id, items_id):
     """delete item of a particular category"""
     deleteItem = session.query(Items).filter_by(id=items_id).one()
@@ -104,7 +130,8 @@ def deleteItem(category_id, items_id):
         session.commit()
         return redirect(url_for('showItems', category_id=category_id))
     else:
-        return render_template('deleteitem.html', category_id=category_id, i=deleteItem)
+        return render_template('deleteitem.html', category_id=category_id,
+                               i=deleteItem)
 
 
 @app.route('/catalog.json/')
@@ -121,13 +148,13 @@ def categoriesJSON():
 
 @app.route('/categories/<int:category_id>/items/json/')
 def categoryItemJSON(category_id):
-    items = session.query(Items).filter_by(category_id = category_id).all()
+    items = session.query(Items).filter_by(category_id=category_id).all()
     return jsonify(Items=[i.serialize for i in items])
 
 
 @app.route('/categories/<int:category_id>/items/<int:items_id>/json/')
 def categoryItemsJSON(category_id, items_id):
-    items = session.query(Items).filter_by(id = items_id).one()
+    items = session.query(Items).filter_by(id=items_id).one()
     return jsonify(Items=[items.serialize])
 
 

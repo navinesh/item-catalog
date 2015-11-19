@@ -1,7 +1,7 @@
 import os
 import sys
 
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -27,6 +27,7 @@ class Items(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
     description = Column(String(250), nullable=False)
+    url = Column(Text, nullable=True, unique=True)
     category_id = Column(Integer, ForeignKey('categories.id'))
     categories = relationship(Categories)
 
@@ -36,6 +37,8 @@ class Items(Base):
         'id' : self.id,
         'name' : self.name,
         'description' : self.description,
+        'category_id' : self.category_id,
+        'url' : self.url,
         }
 
 engine = create_engine('postgresql:///itemcatalog')

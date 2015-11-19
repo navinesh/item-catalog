@@ -1,6 +1,6 @@
 import os
 from flask import Flask, render_template, redirect, url_for, request, \
-     jsonify, send_from_directory
+    jsonify, send_from_directory
 from werkzeug import secure_filename
 
 from sqlalchemy import create_engine
@@ -173,6 +173,12 @@ def categoryItemJSON(category_id):
 def categoryItemsJSON(category_id, items_id):
     items = session.query(Items).filter_by(id=items_id).one()
     return jsonify(Items=[items.serialize])
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    """redirect user if a page is not accessible"""
+    return render_template('error.html'), 404
 
 
 if __name__ == '__main__':

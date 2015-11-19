@@ -10,11 +10,11 @@ a:hover, a:focus {
 
 .btn-grey {
   color: #3e3e3e;
-  border-color: #3e3e3e;
 }
 .btn-grey:hover, .btn-grey:active {
-  color: #0c7cd5;
-  border-color: #0c7cd5;
+  color: #fff;
+  background-color: #aaaaaa;
+  border-color: #aaaaaa;
 }
 
 .btn-custom {

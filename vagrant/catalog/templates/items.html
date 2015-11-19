@@ -86,8 +86,7 @@
           <p>
             <hr /> {% for i in items %}
             <div class="col-md-2">
-              <img src="https://goo.gl/5EKl5b" alt="Item image" class="img-thumbnail" height="100" width="100">
-              {{ i.image }}
+              <img src="{{ i.url }}" alt="Item image" class="img-thumbnail" height="100" width="100">
             </div>
             <h4>{{ i.name }}</h4>
             <i>Description:</i> {{ i.description }}

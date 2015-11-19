@@ -73,6 +73,12 @@ def uploaded_file(filename, category_id):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
+@app.route('/categories/<int:category_id>/<items_id>/edit/<filename>')
+def uploaded_image(filename, category_id, items_id):
+    """serve uploaded image for edit"""
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
 @app.route('/categories/<int:category_id>/')
 @app.route('/categories/<int:category_id>/items/')
 def showItems(category_id):
@@ -118,6 +124,11 @@ def editItem(category_id, items_id):
             editItem.name = request.form['name']
         if request.form['description']:
             editItem.description = request.form['description']
+        file = request.files['file']  # check if an image was posted
+        if file and allowed_file(file.filename):  # check extension
+            filename = secure_filename(file.filename)  # return secure version
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            editItem.url = filename
             session.add(editItem)
             session.commit()
             return redirect(url_for('showItems', category_id=category_id))

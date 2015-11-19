@@ -67,6 +67,12 @@ def deleteCategory(category_id):
         return render_template('deletecategory.html', i=deleteCategory)
 
 
+@app.route('/categories/<int:category_id>/items/<filename>')
+def uploaded_file(filename, category_id):
+    """serve uploaded images"""
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
 @app.route('/categories/<int:category_id>/')
 @app.route('/categories/<int:category_id>/items/')
 def showItems(category_id):
@@ -87,9 +93,9 @@ def newItem(category_id):
     """add new item for a particular category in the database"""
     category = session.query(Categories).filter_by(id=category_id).first()
     if request.method == 'POST':
-        file = request.files['file']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
+        file = request.files['file']  # check if an image was posted
+        if file and allowed_file(file.filename):  # check extension
+            filename = secure_filename(file.filename)  # return secure version
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         newItem = Items(name=request.form['name'], category_id=category_id,
                         description=request.form['description'], url=filename)

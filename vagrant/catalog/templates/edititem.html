@@ -79,7 +79,7 @@
         </div>
       </div>
       <div class="row">
-        <form class='form-horizontal' method='post' action='{{url_for('editItem', category_id=category_id, items_id=i.id)}}'>
+        <form class='form-horizontal' method='post' enctype='multipart/form-data' action='{{url_for('editItem', category_id=category_id, items_id=i.id)}}'>
           <div class="form-group has-feedback">
             <label for="name" class="control-label col-md-4">
               Name:
@@ -94,6 +94,22 @@
             </label>
             <div class="col-md-4">
               <input type="text" name="description" id="description" required="required" class="form-control" value="{{ i.description }}" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="file" class="control-label col-md-4">
+              Image:
+            </label>
+            <div class="col-md-4">
+              <img src="{{ i.url }}" alt="Item image" class="img-thumbnail" height="100" width="100">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="file" class="control-label col-md-4">
+              Change image:
+            </label>
+            <div class="col-md-4">
+              <input type="file" name="file" id="file" />
             </div>
           </div>
           <div class="form-group has-feedback">

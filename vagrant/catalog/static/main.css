@@ -67,6 +67,7 @@ a:hover, a:focus {
 }
 .navbar-default .navbar-brand:hover, .navbar-default .navbar-brand:focus {
   color: #b4c3c7;
+  box-shadow: 0 -3px inset;
 }
 .navbar-default .navbar-text {
   color: #ffffff;
@@ -76,6 +77,7 @@ a:hover, a:focus {
 }
 .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
   color: #b4c3c7;
+  box-shadow: 0 -3px inset;
 }
 .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .active > a:focus {
   color: #b4c3c7;

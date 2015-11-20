@@ -67,6 +67,7 @@ def deleteCategory(category_id):
         return render_template('deletecategory.html', i=deleteCategory)
 
 
+@app.route('/categories/<int:category_id>/<filename>')
 @app.route('/categories/<int:category_id>/items/<filename>')
 def uploaded_file(filename, category_id):
     """serve uploaded images"""
@@ -154,7 +155,8 @@ def deleteItem(category_id, items_id):
 @app.route('/catalog.json/')
 def catalogJSON():
     categories = session.query(Categories).all()
-    return jsonify(Categories=[c.serialize for c in categories])
+    items = session.query(Items).all()
+    return jsonify(Categories=[c.serialize for c in categories], Items=[i.serialize for i in items])
 
 
 @app.route('/categories/json/')
@@ -177,7 +179,7 @@ def categoryItemsJSON(category_id, items_id):
 
 @app.errorhandler(404)
 def page_not_found(error):
-    """redirect user if a page is not accessible"""
+    """redirect user if a page does not exist"""
     return render_template('error.html'), 404
 
 

@@ -77,14 +77,15 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-offset-1 col-md-5">
-          <h3>Categories</h3>
-          {% for i in categories %}
-          <a class="btn btn-grey" href='{{url_for('showItems', category_id=i.id)}}' role="button">{{ i.name }}</a>
-          </br>
-          {% endfor %}
+        <div class="col-md-offset-1 col-md-3">
+          <ul class="nav nav-pills nav-stacked">
+            <li class="active"><a href="#">Categories</a></li>
+            {% for i in categories %}
+            <li><a href='{{url_for('showItems', category_id=i.id)}}'>{{ i.name }}</a></li>
+            {% endfor %}
+          </ul>
         </div>
-        <div class="col-md-offset-1 col-md-5">
+        <div class="col-md-offset-3 col-md-5">
           <h3>Latest items</h3>
         </div>
       </div>

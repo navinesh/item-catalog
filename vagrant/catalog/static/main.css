@@ -1,15 +1,18 @@
-* {
-   font-size: 16px;
-}
+
 body { background: #F3F6F8; }
 
-.btn-grey {
-  color: #3e3e3e;
+.nav-pills > li > a {
+  color: #ecf0f1;
+  background-color: #1e8cbe;
+  border-color: #1e8cbe;
 }
-.btn-grey:hover, .btn-grey:active {
+.nav-pills > li > a:hover, .nav-pills > li > a:focus {
   color: #ffffff;
-  background-color: #aaaaaa;
-  border-color: #aaaaaa;
+  background-color: #1e8cbe;
+  border-color: #1e8cbe;
+}
+.fixed-panel {
+  min-height: 330px;
 }
 .btn-custom {
   color: #1e8cbe;
@@ -20,7 +23,6 @@ body { background: #F3F6F8; }
   background-color: #1e8cbe;
   border-color: #1e8cbe;
 }
-
 .navbar-default {
   background-color: #1e8cbe;
   border-color: #0073a5;
@@ -49,7 +51,6 @@ body { background: #F3F6F8; }
   background-color: #0073a5;
 }
 .navbar-default .navbar-toggle {
-  border-color: #0073a5;
 }
 .navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
   background-color: #0073a5;

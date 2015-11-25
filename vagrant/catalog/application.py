@@ -69,13 +69,13 @@ def deleteCategory(category_id):
 
 
 @app.route('/<filename>/')
-def uploaded_fileimage(filename):
+def uploaded_Image(filename):
     """serve uploaded images for home page"""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route('/categories/<int:category_id>/items/<filename>/')
-def uploaded_file(filename, category_id):
+def uploaded_showImage(filename, category_id):
     """serve uploaded images for category view"""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 

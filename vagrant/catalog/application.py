@@ -30,14 +30,6 @@ def showCategories():
     return render_template('categories.html', categories=categories, items=items)
 
 
-@app.route('/home/')
-def shows():
-    """displays all categories in database"""
-    categories = session.query(Category).all()
-    items = session.query(Item).all()
-    return render_template('home.html', categories=categories, items=items)
-
-
 @app.route('/categories/new/', methods=['GET', 'POST'])
 def newCategory():
     """add new category to the database"""
@@ -76,15 +68,20 @@ def deleteCategory(category_id):
         return render_template('deletecategory.html', i=deleteCategory)
 
 
-@app.route('/categories/<int:category_id>/<filename>')
-@app.route('/categories/<int:category_id>/items/<filename>')
+@app.route('/<filename>/')
+def uploaded_fileimage(filename):
+    """serve uploaded images for home page"""
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+@app.route('/categories/<int:category_id>/items/<filename>/')
 def uploaded_file(filename, category_id):
-    """serve uploaded images"""
+    """serve uploaded images for category view"""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route('/categories/<int:category_id>/<items_id>/edit/<filename>')
-def uploaded_image(filename, category_id, items_id):
+def uploaded_editImage(filename, category_id, items_id):
     """serve uploaded image for edit"""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
@@ -143,7 +140,7 @@ def editItem(category_id, items_id):
             editItem.url = filename
             session.add(editItem)
             session.commit()
-            return redirect(url_for('showItems', category_id=category_id))
+        return redirect(url_for('showItems', category_id=category_id))
     else:
         return render_template('edititem.html', category_id=category_id,
                                i=editItem, c=categories)

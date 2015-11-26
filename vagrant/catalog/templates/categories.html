@@ -88,20 +88,21 @@
         <div class="col-md-10">
           <strong>ITEMS</strong>
           <div class="row">
-          {% for i in items %}
-          <div class="col-md-4">
-            <div class="panel panel-default">
-              <div class="panel-body fixed-panel">
-                <strong>{{ i.name }}</strong>
-                <br></br>
-                <img src="{{ i.url }}" alt="Item image" class="img-thumbnail" height="100" width="100">
-                <br></br>
-                <i>Description:</i> {{ i.description }}
-              </div>
+            {% for i in items %}
+            <div class="col-md-3">
+              {% for c in categories %}
+              <a href='{{url_for('showItem', category_id=c.id, items_id=i.id)}}'>
+                {% endfor %}
+                <div class="panel panel-default">
+                  <div class="panel-body">
+                    <img src="{{ i.url }}" alt="Item image" class="img-rounded" height="100" width="100"></br>
+                    {{ i.name }}
+                  </div>
+                </div>
+              </a>
             </div>
+            {% endfor %}
           </div>
-          {% endfor %}
-        </div>
         </div>
       </div>
     </div>

@@ -1,15 +1,20 @@
 import os
 from flask import Flask, render_template, redirect, url_for, request, \
-    jsonify, send_from_directory
+    jsonify, send_from_directory, flash
 from werkzeug import secure_filename
+
+# Imports for login session
+from flask import session as login_session
+import random
+import string
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item
 
-# directory to store images
+# Directory to store images
 UPLOAD_FOLDER = 'uploads/'
-# image extensions allowed to be uploaded
+# Image extensions allowed to be uploaded
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
@@ -21,13 +26,25 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
+# Create anti-forgery state token
+@app.route('/login')
+def showLogin():
+    """create a state token to prevent request forgery
+    and store it in the session for later verification"""
+    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                    for x in xrange(32))
+    login_session['state'] = state
+    return "The current session state is %s" % login_session['state']
+
+
 @app.route('/')
 @app.route('/categories/')
 def showCategories():
     """displays all categories in database"""
     categories = session.query(Category).all()
     items = session.query(Item).all()
-    return render_template('categories.html', categories=categories, items=items)
+    return render_template('categories.html', categories=categories,
+                           items=items)
 
 
 @app.route('/categories/new/', methods=['GET', 'POST'])
@@ -170,6 +187,7 @@ def deleteItem(category_id, items_id):
                                i=deleteItem)
 
 
+# JSON APIs to view sports catalog
 @app.route('/catalog.json/')
 def catalogJSON():
     categories = session.query(Category).all()
@@ -203,5 +221,6 @@ def page_not_found(error):
 
 
 if __name__ == '__main__':
+    app.secret_key = 'super secret key'
     app.debug = True
     app.run(host='0.0.0.0', port=8000)

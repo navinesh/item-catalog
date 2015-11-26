@@ -90,9 +90,10 @@
           <div class="row">
             {% for i in items %}
             <div class="col-md-3">
-              {% for c in categories %}
+              {% for c in categories %} {% if c.id == i.category_id %}
               <a href='{{url_for('showItem', category_id=c.id, items_id=i.id)}}'>
-                {% endfor %}
+              {% endif %}
+              {% endfor %}
                 <div class="panel panel-default">
                   <div class="panel-body">
                     <img src="{{ i.url }}" alt="Item image" class="img-rounded" height="100" width="100"></br>

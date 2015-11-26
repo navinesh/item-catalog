@@ -20,7 +20,7 @@
     <![endif]-->
     <style>
       body {
-        padding-top: 70px;
+        padding-top: 100px;
       }
 
     </style>
@@ -73,19 +73,25 @@
         </div>
       </div>
       <div class="row">
-        <form class='form-horizontal' method='post' action='{{url_for('deleteCategory', category_id=i.id)}}'>
-          <div class="form-group has-feedback">
-            <div class="col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">
-              <h4>Are you sure you want to delete {{i.name}}?</h4>
+        <div class="col-md-offset-2 col-md-8">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <form class='form-horizontal' method='post' action='{{url_for('deleteCategory', category_id=i.id)}}'>
+                <div class="form-group has-feedback">
+                  <div class="text-center">
+                    <h4>Are you sure you want to delete {{i.name}}?</h4>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">Delete</button>
+                </div>
+                <div class="form-group">
+                  <a href='{{url_for('showItems', category_id=i.id)}}' class='btn btn-warning col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4' role='button'>Cancel</a>
+                </div>
+              </form>
             </div>
           </div>
-          <div class="form-group">
-            <button type="submit" class="btn btn-primary col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4">Delete</button>
-          </div>
-          <div class="form-group">
-            <a href='{{url_for('showItems', category_id=i.id)}}' class='btn btn-warning col-xs-offset-1 col-xs-10 col-md-offset-4 col-md-4' role='button'>Cancel</a>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
 

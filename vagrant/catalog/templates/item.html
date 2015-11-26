@@ -74,7 +74,7 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <h4>{{ category.name }}</h4>
+          <a href='{{url_for('showItems', category_id=category.id)}}'>{{ category.name }}</a>
           <hr />
           <div class="panel panel-default">
             <div class="panel-body">

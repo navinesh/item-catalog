@@ -69,6 +69,7 @@ def deleteCategory(category_id):
 
 
 @app.route('/<filename>/')
+@app.route('/categories/<filename>/')
 def uploaded_Image(filename):
     """serve uploaded images for home page"""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
@@ -80,10 +81,19 @@ def uploaded_showImage(filename, category_id):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
+@app.route('/categories/<int:category_id>/<items_id>/<filename>/')
 @app.route('/categories/<int:category_id>/<items_id>/edit/<filename>')
 def uploaded_editImage(filename, category_id, items_id):
     """serve uploaded image for edit"""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+@app.route('/categories/<int:category_id>/<items_id>/')
+def showItem(items_id, category_id):
+    """displays details of single item"""
+    category = session.query(Category).filter_by(id=category_id).first()
+    item = session.query(Item).filter_by(id=items_id).one()
+    return render_template('item.html', item=item, category=category)
 
 
 @app.route('/categories/<int:category_id>/')
@@ -163,8 +173,9 @@ def deleteItem(category_id, items_id):
 @app.route('/catalog.json/')
 def catalogJSON():
     categories = session.query(Category).all()
-    items = session.query(Items).all()
-    return jsonify(Categories=[c.serialize for c in categories], Items=[i.serialize for i in items])
+    items = session.query(Item).all()
+    return jsonify(Categories=[c.serialize for c in categories],
+                   Items=[i.serialize for i in items])
 
 
 @app.route('/categories/json/')
@@ -182,7 +193,7 @@ def categoryItemJSON(category_id):
 @app.route('/categories/<int:category_id>/items/<int:items_id>/json/')
 def categoryItemsJSON(category_id, items_id):
     items = session.query(Item).filter_by(id=items_id).one()
-    return jsonify(Items=[items.serialize])
+    return jsonify(Item=[items.serialize])
 
 
 @app.errorhandler(404)

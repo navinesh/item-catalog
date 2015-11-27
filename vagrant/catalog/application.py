@@ -54,6 +54,91 @@ def showLogin():
     return render_template('login.html', STATE=state)  # render login template
 
 
+@app.route('/gconnect', methods=['POST'])
+def gconnect():
+    """Handle calls sent back by call-back method"""
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps('Invalid state paramater'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    code = request.data  # Obtain authorization code
+
+    try:
+        # upgrade authorisation code into credentials object
+        # which will contain access token for server
+        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow.redirect_uri = 'postmessage'
+        credentials = oauth_flow.step2_exchange(code)
+    except FlowExchangeError:
+        response = make_response(json.dumps(
+            'Failed to upgrade authorisation code'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # Check if access token is valid
+    access_token = credentials.access_token
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
+           % access_token)
+    h = httplib2.Http()
+    result = json.loads(h.request(url, 'GET')[1])
+
+    # if there was error in access token info then abort
+    if result.get('error') is not None:
+        response = make_response(json.dumps(result.get('error')), 500)
+        response.headers['Content-Type'] = 'application/json'
+
+    # verify that access token is used for the intended user
+    gplus_id = credentials.id_token['sub']
+    if result['user_id'] != gplus_id:
+        response = make_response(
+            json.dumps("Token's user ID does not match user ID"), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # verify that the access token is valid for this app
+    if result['issued_to'] != CLIENT_ID:
+        response = make_response(json.dumps(
+            "Token's client ID does not match app's"), 401)
+        print "Token's client ID does not match app's"
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+    # check if user is already logged in
+    stored_credentials = login.session.get('credentials')
+    stored_gplus_id = login_session.get('gplus_id')
+    if stored_credentials is not None and gplus_id == stored_gplus_id:
+        response = make_response(json.dumps
+                                 ('Current user is already connected'),
+                                 200)
+        response.headers['Content-Type'] = 'application/json'
+
+    # Store access taken in session for later use
+    login_session['credentials'] = credentials
+    login_session['gplus_id'] = gplus_id
+
+    # Get user info
+    userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+    params = {'access_token': credentials.access_token, 'alt': 'json'}
+    answer = requests.get(userinfo_url, params=params)
+    data = json.loads(answer.txt)
+
+    login_session['username'] = data['name']
+    login_session['picture'] = data['picture']
+    login_session['email'] = data['email']
+
+    output = ''
+    output += '<h1>Welcome, '
+    output += login_session['username']
+    output += '!</h1>'
+    output += '<img src="'
+    output += login_session['picture']
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    flash("you are now logged in as %s" % login_session['username'])
+    print "done!"
+    return output
+
+
 @app.route('/')
 @app.route('/categories/')
 def showCategories():

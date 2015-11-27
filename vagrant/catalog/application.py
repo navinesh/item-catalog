@@ -8,9 +8,26 @@ from flask import session as login_session
 import random
 import string
 
+# Libaries to handle code sent from call-back method
+# create flow object from client secret json file which stores client-id,
+# client-secret, other o-auth paramaters
+from oauth2client.client import flow_from_clientsecrets
+# catch error when exchanging authorisation code for access token
+from oauth2client.client import FlowExchangeError
+import httplib2  # http library
+import json  # provides api for converting in memory python objects to json
+from flask import make_response  # convert return value from function to object
+import requests  # Apache2 HTTP library that send HTTP/1.1 requests
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item
+
+
+# Declare client-id by referencing client secrets file
+CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())[
+    'web']['client_id']
+
 
 # Directory to store images
 UPLOAD_FOLDER = 'uploads/'
@@ -34,7 +51,7 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
-    return "The current session state is %s" % login_session['state']
+    return render_template('login.html', STATE=state)  # render login template
 
 
 @app.route('/')

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="/static/main.css" type="text/css" />
+
+    <style>
+      body {
+        padding-top: 100px;
+      }
+
+    </style>
+
+    <!-- Load pre-requisites for Google sign-in -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="//apis.google.com/js/platform.js?onload=start">
+
+
+    </script>
+
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-offset-2 col-md-8">
+          <div class="panel panel-default">
+            <div class="panel-body text-center">
+              <p>
+                <h4>Log in to Sports catalog</h4>
+              </p>
+              <br></br>
+              <div id="signInButton">
+                <span class="g-signin" data-scope="openid email" data-clientid="881723544237-vbg78085jadmhbdg5m88kpff13h3hmgm.apps.googleusercontent.com" data-redirecturi="postmessage" data-accesstype="offline" data-cookiepolicy="single_host_origin" data-callback="signInCallback"
+                data-approvalprompt="force">
+                </span>
+              </div>
+              <br></br>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="result"></div>
+    </div>
+
+    <div id="result"></div>
+
+
+    <script>
+      function signInCallback(authResult) {
+        if (authResult['code']) {
+          // After successful authentication hide Google sign-in button
+          $('#signinButton').attr('style', 'display: none');
+          // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the home page
+          $.ajax({
+            type: 'POST',
+            url: '/gconnect?state={{STATE}}',
+            processData: false,
+            data: authResult['code'],
+            contentType: 'application/octet-stream; charset=utf-8',
+            success: function(result) {
+              // Handle or verify the server response if necessary.
+              if (result) {
+                $('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')
+                setTimeout(function() {
+                  window.location.href = "/restaurant";
+                }, 4000);
+
+              } else if (authResult['error']) {
+                console.log('There was an error: ' + authResult['error']);
+              } else {
+                $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+              }
+            }
+
+          });
+        }
+      }
+
+    </script>
+    <!--
+    <script>
+      function signInCallback(authResult) {
+        if (authResult['code']) {
+          // After successful authentication remove Google sign-in button
+          $('#signInButton').attr('style', 'display:none');
+          // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the home page
+          $.ajax({
+              type: 'POST',
+              url: '/gconnect?state={{STATE}}',
+              processData: false,
+              contentType: 'application/octet-stream; charset=utf-8',
+              data: authResult['code'],
+              success: function(result) {
+                if (result) {
+                  $('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')
+                  setTimeout(function() {
+                    window.location.href = "/categories";
+                  }), 4000);
+              } else if (authResult['error']) {
+                console.log('There was an error: ' + authResult['error']);
+              } else {
+                $('#result').html('Failed to make a server-side call. Check your configuration and console');
+              }
+            }
+          });
+      }
+      }
+
+    </script>
+-->
+  </body>
+
+</html>

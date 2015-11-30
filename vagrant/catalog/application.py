@@ -51,7 +51,7 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
-    return render_template('login.html', STATE=state)  # render login template
+    return render_template('login.html')  # render login template
 
 
 @app.route('/gconnect', methods=['POST'])
@@ -121,7 +121,7 @@ def gconnect():
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
-    data = json.loads(answer.txt)
+    data = json.loads(answer.text)
 
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
@@ -137,6 +137,41 @@ def gconnect():
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
+
+
+# Log out user - revoke current users token and reset their login_session
+@app.route("/gdisconnect")
+def gdisconnect():
+    """ """
+    # Only disconnect a connected user
+    credentials = login_session.get('credentials')
+    if credentials is None:
+        response = make_response(json.dumps("Current user not connected"), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    # Execute HTTP GET request to revoke current token
+    access_token = credentials.access_token
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0]
+
+    if result['status'] == '200':
+        # Resets users' session
+        del login_session['credentials']
+        del login_session['gplus_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+
+        response = make_response(json.dumps('disconnected'), 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    else:
+        # If token was invalid
+        response = make_response(json.dumps(
+            'Failed to revoke token for given user'), 400)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
 
 @app.route('/')

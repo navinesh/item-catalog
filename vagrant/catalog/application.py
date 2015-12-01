@@ -21,7 +21,7 @@ import requests  # Apache2 HTTP library that send HTTP/1.1 requests
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Category, Item
+from database_setup import Base, Category, Item, User
 
 
 # Declare client-id by referencing client secrets file
@@ -127,6 +127,12 @@ def googleConnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
+    # Check if a user exists in the database, if it doesn't then create it
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+        return login_session['user_id'] = user.id
+
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -143,7 +149,8 @@ def googleConnect():
 
 @app.route("/gdisconnect")
 def googleDisconnect():
-    """Log out user - revoke current users token and reset their login_session"""
+    """Log out user, revoke current users' token and
+    reset their login_session"""
     # Only disconnect a connected user
     credentials = login_session.get('credentials')
     if credentials is None:
@@ -176,6 +183,32 @@ def googleDisconnect():
         return response
 
 
+def createUser(login_session):
+    """Get logged-in user info to create new user in database"""
+    newUser = User(name=login_session['username'], email=login_session[
+                   'email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+
+def getUserInfo(user_id):
+    """Return user object associated with user ID"""
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def getUserID(email):
+    """Return ID number of a user if email address belongs to
+    a user in the database. Return none if it does not exist"""
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        None
+
+
 @app.route('/')
 @app.route('/categories/')
 def showCategories():
@@ -189,8 +222,12 @@ def showCategories():
 @app.route('/categories/new/', methods=['GET', 'POST'])
 def newCategory():
     """add new category to the database"""
+    # check if user is logged in
+    if 'username' not in login_session:
+        return redirect('/login')
     if request.method == 'POST':
-        newCategory = Category(name=request.form['name'])
+        newCategory = Category(
+            name=request.form['name'], user_id=login_session['user_id'])
         session.add(newCategory)
         session.commit()
         return redirect(url_for('showCategories'))
@@ -201,6 +238,9 @@ def newCategory():
 @app.route('/categories/<int:category_id>/edit/', methods=['GET', 'POST'])
 def editCategory(category_id):
     """edit category"""
+    # check if user is logged in
+    if 'username' not in login_session:
+        return redirect('/login')
     editCategory = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
         if request.form['name']:
@@ -215,6 +255,9 @@ def editCategory(category_id):
 @app.route('/categories/<int:category_id>/delete/', methods=['GET', 'POST'])
 def deleteCategory(category_id):
     """delete category"""
+    # check if user is logged in
+    if 'username' not in login_session:
+        return redirect('/login')
     deleteCategory = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
         session.delete(deleteCategory)
@@ -281,8 +324,11 @@ def newItem(category_id):
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         else:
             filename = None
-        newItem = Item(name=request.form['name'], category_id=category_id,
-                       description=request.form['description'], url=filename)
+        newItem = Item(name=request.form['name'],
+                       description=request.form['description'],
+                       url=filename,
+                       category_id=category_id,
+                       user_id=login_session['user_id'])
         session.add(newItem)
         session.commit()
         return redirect(url_for('showItems', category_id=category_id))

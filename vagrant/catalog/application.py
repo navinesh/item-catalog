@@ -51,11 +51,11 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
-    return render_template('login.html')  # render login template
+    return render_template('login.html', STATE=state)  # render login template
 
 
 @app.route('/gconnect', methods=['POST'])
-def gconnect():
+def googleConnect():
     """Handle calls sent back by call-back method"""
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state paramater'), 401)
@@ -105,7 +105,7 @@ def gconnect():
         return response
 
     # check if user is already logged in
-    stored_credentials = login.session.get('credentials')
+    stored_credentials = login_session.get('credentials')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_credentials is not None and gplus_id == stored_gplus_id:
         response = make_response(json.dumps
@@ -121,7 +121,7 @@ def gconnect():
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
-    data = json.loads(answer.text)
+    data = answer.json()
 
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
@@ -133,16 +133,17 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px; \
+    border-radius: 150px;-webkit-border-radius: 150px; \
+    -moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
 
 
-# Log out user - revoke current users token and reset their login_session
 @app.route("/gdisconnect")
-def gdisconnect():
-    """ """
+def googleDisconnect():
+    """Log out user - revoke current users token and reset their login_session"""
     # Only disconnect a connected user
     credentials = login_session.get('credentials')
     if credentials is None:
@@ -163,13 +164,14 @@ def gdisconnect():
         del login_session['email']
         del login_session['picture']
 
-        response = make_response(json.dumps('disconnected'), 200)
+        response = make_response(json.dumps(
+            'Current user successfully disconnected'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
         # If token was invalid
         response = make_response(json.dumps(
-            'Failed to revoke token for given user'), 400)
+            'Failed to revoke token for given user', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -267,7 +269,10 @@ def allowed_file(filename):
 
 @app.route('/categories/<int:category_id>/items/new/', methods=['GET', 'POST'])
 def newItem(category_id):
-    """add new item for a particular category in the database"""
+    """Create a new itme for a particular category"""
+    # check if user is logged in
+    if 'username' not in login_session:
+        return redirect('/login')
     category = session.query(Category).filter_by(id=category_id).first()
     if request.method == 'POST':
         file = request.files['file']  # check if an image was posted
@@ -289,7 +294,10 @@ def newItem(category_id):
 @app.route('/categories/<int:category_id>/<items_id>/edit/',
            methods=['GET', 'POST'])
 def editItem(category_id, items_id):
-    """edit item of a particular category"""
+    """Edit an item of a particular category"""
+    # check if user is logged in
+    if 'username' not in login_session:
+        return redirect('/login')
     categories = session.query(Category).all()
     editItem = session.query(Item).filter_by(id=items_id).one()
     if request.method == 'POST':
@@ -313,7 +321,10 @@ def editItem(category_id, items_id):
 @app.route('/categories/<int:category_id>/<items_id>/delete/',
            methods=['GET', 'POST'])
 def deleteItem(category_id, items_id):
-    """delete item of a particular category"""
+    """Delete an item of a particular category"""
+    # check if user is logged in
+    if 'username' not in login_session:
+        return redirect('/login')
     deleteItem = session.query(Item).filter_by(id=items_id).one()
     if request.method == 'POST':
         session.delete(deleteItem)

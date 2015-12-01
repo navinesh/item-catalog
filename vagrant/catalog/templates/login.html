@@ -20,7 +20,7 @@
 
     <!-- Load pre-requisites for Google sign-in -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
+    <script src="//apis.google.com/js/platform.js?onload=start"> </script>
 
   </head>
 
@@ -34,9 +34,9 @@
                 <h4>Log in to Sports catalog</h4>
               </p>
               <br></br>
-              <div id="signinButton">
+              <div id="signInButton">
                 <span class="g-signin"
-                data-scope="openid"
+                data-scope="openid email"
                 data-clientid="881723544237-vbg78085jadmhbdg5m88kpff13h3hmgm.apps.googleusercontent.com"
                 data-redirecturi="postmessage"
                 data-accesstype="offline"
@@ -57,7 +57,7 @@
       function signInCallback(authResult) {
         if (authResult['code']) {
           // After successful authentication remove Google sign-in button
-          $('#signinButton').attr('style', 'display:none');
+          $('#signInButton').attr('style', 'display:none');
           // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the home page
           $.ajax({
               type: 'POST',

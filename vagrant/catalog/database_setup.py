@@ -8,14 +8,26 @@ from sqlalchemy import create_engine
 Base = declarative_base()
 
 
+class User(Base):
+    __tablename__ = 'user'  # representation of table inside database
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=False)
+    picture = Column(String(250))
+
+
 class Category(Base):
     __tablename__ = 'category'  # representation of table inside database
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(100), nullable=False)
+    name = Column(String(250), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
     @property
     def serialize(self):
+        """Return data in serializeable format"""
         return {
             'id': self.id,
             'name': self.name,
@@ -26,15 +38,18 @@ class Item(Base):
     __tablename__ = 'item'  # representation of table inside database
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(100), nullable=False)
+    name = Column(String(250), nullable=False)
     description = Column(String(250), nullable=False)
     url = Column(Text, nullable=True, unique=True)
     category_id = Column(Integer, ForeignKey('category.id'))
     category = relationship(
         Category, backref=backref("items", cascade="all, delete-orphan"))
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
     @property
     def serialize(self):
+        """Return data in serializeable format"""
         return {
             'id': self.id,
             'name': self.name,
@@ -42,6 +57,7 @@ class Item(Base):
             'category_id': self.category_id,
             'url': self.url,
         }
+
 
 engine = create_engine('postgresql:///itemcatalog')
 

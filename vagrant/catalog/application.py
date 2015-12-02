@@ -46,7 +46,7 @@ session = DBSession()
 # Create anti-forgery state token
 @app.route('/login')
 def showLogin():
-    """create a state token to prevent request forgery
+    """Create a state token to prevent request forgery
     and store it in the session for later verification"""
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
@@ -131,7 +131,7 @@ def googleConnect():
     user_id = getUserID(login_session['email'])
     if not user_id:
         user_id = createUser(login_session)
-        return login_session['user_id'] = user.id
+    login_session['user_id'] = user_id
 
     output = ''
     output += '<h1>Welcome, '
@@ -212,11 +212,15 @@ def getUserID(email):
 @app.route('/')
 @app.route('/categories/')
 def showCategories():
-    """displays all categories in database"""
+    """Displays all categories and its items"""
     categories = session.query(Category).all()
     items = session.query(Item).all()
-    return render_template('categories.html', categories=categories,
-                           items=items)
+    if 'username' not in login_session:
+        return render_template('public-categories.html', categories=categories,
+                               items=items)
+    else:
+        return render_template('categories.html', categories=categories,
+                               items=items)
 
 
 @app.route('/categories/new/', methods=['GET', 'POST'])

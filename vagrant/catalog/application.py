@@ -342,7 +342,7 @@ def newItem(category_id):
     if 'username' not in login_session:
         return redirect('/login')
     category = session.query(Category).filter_by(id=category_id).first()
-    if editItem.user_id != login_session['user_id']:
+    if login_session['user_id'] != category.user_id:
         return "< script > function myFunction() {alert('You are not \
                 authorised to edit this item!');}</script> \
                 <body onload='myFunction()'' >"
@@ -375,7 +375,7 @@ def editItem(category_id, items_id):
         return redirect('/login')
     categories = session.query(Category).all()
     editItem = session.query(Item).filter_by(id=items_id).one()
-    if editItem.user_id != login_session['user_id']:
+    if login_session['user_id'] != category.user_id:
         return "< script > function myFunction() {alert('You are not \
                 authorised to edit this item!');}</script> \
                 <body onload='myFunction()'' >"
@@ -405,7 +405,7 @@ def deleteItem(category_id, items_id):
     if 'username' not in login_session:
         return redirect('/login')
     deleteItem = session.query(Item).filter_by(id=items_id).one()
-    if deleteItem.user_id != login_session['user_id']:
+    if login_session['user_id'] != category.user_id:
         return "< script > function myFunction() {alert('You are not \
                 authorised to delete this item!');}</script> \
                 <body onload='myFunction()'' >"

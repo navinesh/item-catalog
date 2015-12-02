@@ -212,7 +212,7 @@ def getUserID(email):
 @app.route('/')
 @app.route('/categories/')
 def showCategories():
-    """Displays all categories and its items"""
+    """Display all categories and its items"""
     categories = session.query(Category).all()
     items = session.query(Item).all()
     if 'username' not in login_session:
@@ -225,7 +225,7 @@ def showCategories():
 
 @app.route('/categories/new/', methods=['GET', 'POST'])
 def newCategory():
-    """add new category to the database"""
+    """Add new category to the database"""
     # check if user is logged in
     if 'username' not in login_session:
         return redirect('/login')
@@ -241,7 +241,7 @@ def newCategory():
 
 @app.route('/categories/<int:category_id>/edit/', methods=['GET', 'POST'])
 def editCategory(category_id):
-    """edit category"""
+    """Edit category"""
     # check if user is logged in
     if 'username' not in login_session:
         return redirect('/login')
@@ -258,7 +258,7 @@ def editCategory(category_id):
 
 @app.route('/categories/<int:category_id>/delete/', methods=['GET', 'POST'])
 def deleteCategory(category_id):
-    """delete category"""
+    """Delete category"""
     # check if user is logged in
     if 'username' not in login_session:
         return redirect('/login')
@@ -274,26 +274,26 @@ def deleteCategory(category_id):
 @app.route('/<filename>/')
 @app.route('/categories/<filename>/')
 def uploaded_Image(filename):
-    """serve uploaded images for home page"""
+    """Serve uploaded images for home page"""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route('/categories/<int:category_id>/items/<filename>/')
 def uploaded_showImage(filename, category_id):
-    """serve uploaded images for category view"""
+    """Serve uploaded images for category view"""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route('/categories/<int:category_id>/<items_id>/<filename>/')
 @app.route('/categories/<int:category_id>/<items_id>/edit/<filename>')
 def uploaded_editImage(filename, category_id, items_id):
-    """serve uploaded image for edit"""
+    """Serve uploaded image for edit"""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route('/categories/<int:category_id>/<items_id>/')
 def showItem(items_id, category_id):
-    """displays details of single item"""
+    """Display details of single item"""
     category = session.query(Category).filter_by(id=category_id).first()
     item = session.query(Item).filter_by(id=items_id).one()
     return render_template('item.html', item=item, category=category)
@@ -302,21 +302,25 @@ def showItem(items_id, category_id):
 @app.route('/categories/<int:category_id>/')
 @app.route('/categories/<int:category_id>/items/')
 def showItems(category_id):
-    """displays all items in each category"""
+    """Display all item in each category"""
     category = session.query(Category).filter_by(id=category_id).first()
     items = session.query(Item).filter_by(category_id=category_id)
-    return render_template('items.html', category=category, items=items)
+    if 'username' not in login_session:
+        return render_template('public-items.html', category=category,
+                               items=items)
+    else:
+        return render_template('items.html', category=category, items=items)
 
 
 def allowed_file(filename):
-    """check if an image extension is allowed"""
+    """Check if an image extension is allowed"""
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
 @app.route('/categories/<int:category_id>/items/new/', methods=['GET', 'POST'])
 def newItem(category_id):
-    """Create a new itme for a particular category"""
+    """Create a new item for a particular category"""
     # check if user is logged in
     if 'username' not in login_session:
         return redirect('/login')

@@ -1,0 +1,33 @@
+{% extends "main.html" %}
+{% block content %}
+      <div class="row">
+        <div class="col-md-2">
+          <strong>CATEGORIES</strong>
+          <ul class="nav nav-pills nav-stacked">
+            {% for c in categories %}
+            <li><a href='{{url_for('showItems', category_id=c.id)}}'>{{ c.name }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="col-md-10">
+          <strong>ITEMS</strong>
+          <div class="row">
+            {% for i in items %}
+            <div class="col-md-3">
+              {% for c in categories %} {% if c.id == i.category_id %}
+              <a href='{{url_for('showItem', category_id=c.id, items_id=i.id)}}'>
+              {% endif %}
+              {% endfor %}
+                <div class="panel panel-default">
+                  <div class="panel-body text-center">
+                    <img src="{{ i.url }}" alt="Item image" class="img-rounded" height="100" width="100"></br>
+                    {{ i.name }}
+                  </div>
+                </div>
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+{% endblock %}

@@ -305,7 +305,14 @@ def showItem(items_id, category_id):
     """Display details of single item"""
     category = session.query(Category).filter_by(id=category_id).first()
     item = session.query(Item).filter_by(id=items_id).one()
-    return render_template('item.html', item=item, category=category)
+    creator = getUserInfo(category.user_id)  # get creator info
+    if 'username' not in login_session or \
+            creator.id != login_session['user_id']:
+        return render_template('public-item.html', category=category,
+                               item=item)
+    else:
+        return render_template('item.html', category=category,
+                               item=item)
 
 
 @app.route('/categories/<int:category_id>/')
@@ -374,6 +381,7 @@ def editItem(category_id, items_id):
     if 'username' not in login_session:
         return redirect('/login')
     categories = session.query(Category).all()
+    category = session.query(Category).filter_by(id=category_id).first()
     editItem = session.query(Item).filter_by(id=items_id).one()
     if login_session['user_id'] != category.user_id:
         return "< script > function myFunction() {alert('You are not \
@@ -404,6 +412,7 @@ def deleteItem(category_id, items_id):
     # check if user is logged in
     if 'username' not in login_session:
         return redirect('/login')
+    category = session.query(Category).filter_by(id=category_id).first()
     deleteItem = session.query(Item).filter_by(id=items_id).one()
     if login_session['user_id'] != category.user_id:
         return "< script > function myFunction() {alert('You are not \

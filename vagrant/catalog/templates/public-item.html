@@ -1,0 +1,23 @@
+{% extends "main.html" %}
+{% block title %}Item - Sports catalog{% endblock %}
+{% block link %}<a href="/login">Login</a>{% endblock %}
+{% block content %}
+      <div class="row">
+        <div class="col-md-12">
+          <a href='{{url_for('showItems', category_id=category.id)}}'>{{ category.name }}</a>
+          <hr />
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="col-md-2">
+                <img src="{{ item.url }}" alt="Item image" class="img-thumbnail" height="100" width="100">
+              </div>
+              <div class="col-md-10">
+                <h4>{{ item.name }}</h4>
+                <i>Description:</i> {{ item.description }}
+                </br>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}

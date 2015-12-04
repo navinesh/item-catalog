@@ -142,7 +142,7 @@ def googleConnect():
     output += ' " style = "width: 300px; height: 300px; \
     border-radius: 150px;-webkit-border-radius: 150px; \
     -moz-border-radius: 150px;"> '
-    flash("you are now logged in as %s" % login_session['username'])
+    flash("You are now logged in as %s" % login_session['username'])
     print "done!"
     return output
 
@@ -236,7 +236,7 @@ def newCategory():
             name=request.form['name'], user_id=login_session['user_id'])
         session.add(newCategory)
         session.commit()
-        flash('New Category %s Successfully Created' % (newCategory.name))
+        flash('New category %s successfully created' % (newCategory.name))
         return redirect(url_for('showCategories'))
     else:
         return render_template('newcategory.html')
@@ -251,13 +251,16 @@ def editCategory(category_id):
     editCategory = session.query(Category).filter_by(id=category_id).one()
     creator = getUserInfo(editCategory.user_id)  # get creator info
     if editCategory.user_id != login_session['user_id']:
-        return "<script>function myFunction() {alert('You are not authorised to edit this item!');}</script><body onload='myFunction()'' >"
+        return "<script>function myFunction() {alert\
+        ('You are not authorised to edit this item!');}\
+        </script><body onload='myFunction()'' >"
     if request.method == 'POST':
         if request.form['name']:
             editCategory.name = request.form['name']
-            session.add(editCategory)
-            session.commit()
-            return redirect(url_for('showCategories'))
+        session.add(editCategory)
+        session.commit()
+        flash('Category %s successfully edited' % (editCategory.name))
+        return redirect(url_for('showCategories'))
     else:
         return render_template('editcategory.html', i=editCategory,
                                creator=creator)
@@ -278,6 +281,7 @@ def deleteCategory(category_id):
     if request.method == 'POST':
         session.delete(deleteCategory)
         session.commit()
+        flash('Categiry %s successfully deleted' % (deleteCategory.name))
         return redirect(url_for('showCategories'))
     else:
         return render_template('deletecategory.html', i=deleteCategory,
@@ -372,6 +376,7 @@ def newItem(category_id):
                        user_id=login_session['user_id'])
         session.add(newItem)
         session.commit()
+        flash('Item %s successfully created' % (newItem.name))
         return redirect(url_for('showItems', category_id=category_id))
     else:
         return render_template('newitem.html', category_id=category_id,
@@ -398,13 +403,16 @@ def editItem(category_id, items_id):
             editItem.name = request.form['name']
         if request.form['description']:
             editItem.description = request.form['description']
+        if request.form['categoryID']:
+            editItem.category_id = request.form['categoryID']
         file = request.files['file']  # check if an image was posted
         if file and allowed_file(file.filename):  # check extension
             filename = secure_filename(file.filename)  # return secure version
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             editItem.url = filename
-            session.add(editItem)
-            session.commit()
+        session.add(editItem)
+        session.commit()
+        flash('Item %s successfully edited' % (editItem.name))
         return redirect(url_for('showItems', category_id=category_id))
     else:
         return render_template('edititem.html', category_id=category_id,
@@ -428,6 +436,7 @@ def deleteItem(category_id, items_id):
     if request.method == 'POST':
         session.delete(deleteItem)
         session.commit()
+        flash('Item %s successfully deleted' % (deleteItem.name))
         return redirect(url_for('showItems', category_id=category_id))
     else:
         return render_template('deleteitem.html', category_id=category_id,

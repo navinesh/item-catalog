@@ -249,8 +249,9 @@ def editCategory(category_id):
     if 'username' not in login_session:
         return redirect('/login')
     editCategory = session.query(Category).filter_by(id=category_id).one()
+    creator = getUserInfo(editCategory.user_id)  # get creator info
     if editCategory.user_id != login_session['user_id']:
-        return "< script > function myFunction() {alert('You are not authorised to edit this item!');}</script><body onload='myFunction()'' >"
+        return "<script>function myFunction() {alert('You are not authorised to edit this item!');}</script><body onload='myFunction()'' >"
     if request.method == 'POST':
         if request.form['name']:
             editCategory.name = request.form['name']
@@ -258,7 +259,8 @@ def editCategory(category_id):
             session.commit()
             return redirect(url_for('showCategories'))
     else:
-        return render_template('editcategory.html', i=editCategory)
+        return render_template('editcategory.html', i=editCategory,
+                               creator=creator)
 
 
 @app.route('/categories/<int:category_id>/delete/', methods=['GET', 'POST'])
@@ -268,6 +270,7 @@ def deleteCategory(category_id):
     if 'username' not in login_session:
         return redirect('/login')
     deleteCategory = session.query(Category).filter_by(id=category_id).one()
+    creator = getUserInfo(deleteCategory.user_id)  # get creator info
     if deleteCategory.user_id != login_session['user_id']:
         return "< script > function myFunction() {alert('You are not \
                 authorised to edit this item!');}</script> \
@@ -277,7 +280,8 @@ def deleteCategory(category_id):
         session.commit()
         return redirect(url_for('showCategories'))
     else:
-        return render_template('deletecategory.html', i=deleteCategory)
+        return render_template('deletecategory.html', i=deleteCategory,
+                               creator=creator)
 
 
 @app.route('/<filename>/')
@@ -312,7 +316,7 @@ def showItem(items_id, category_id):
                                item=item)
     else:
         return render_template('item.html', category=category,
-                               item=item)
+                               item=item, creator=creator)
 
 
 @app.route('/categories/<int:category_id>/')
@@ -349,10 +353,11 @@ def newItem(category_id):
     if 'username' not in login_session:
         return redirect('/login')
     category = session.query(Category).filter_by(id=category_id).first()
+    creator = getUserInfo(category.user_id)  # get creator info
     if login_session['user_id'] != category.user_id:
-        return "< script > function myFunction() {alert('You are not \
-                authorised to edit this item!');}</script> \
-                <body onload='myFunction()'' >"
+        return "<script>function myFunction(){alert \
+        ('You are not authorised to create new item for this category!');} \
+        </script><body onload='myFunction()'' >"
     if request.method == 'POST':
         file = request.files['file']  # check if an image was posted
         if file and allowed_file(file.filename):  # check extension
@@ -370,7 +375,7 @@ def newItem(category_id):
         return redirect(url_for('showItems', category_id=category_id))
     else:
         return render_template('newitem.html', category_id=category_id,
-                               category_name=category.name)
+                               category_name=category.name, creator=creator)
 
 
 @app.route('/categories/<int:category_id>/<items_id>/edit/',
@@ -382,11 +387,12 @@ def editItem(category_id, items_id):
         return redirect('/login')
     categories = session.query(Category).all()
     category = session.query(Category).filter_by(id=category_id).first()
+    creator = getUserInfo(category.user_id)  # get creator info
     editItem = session.query(Item).filter_by(id=items_id).one()
     if login_session['user_id'] != category.user_id:
-        return "< script > function myFunction() {alert('You are not \
-                authorised to edit this item!');}</script> \
-                <body onload='myFunction()'' >"
+        return "<script>function myFunction() {alert\
+        ('You are not authorised to edit this item!');}\
+        </script><body onload='myFunction()'' >"
     if request.method == 'POST':
         if request.form['name']:
             editItem.name = request.form['name']
@@ -402,7 +408,7 @@ def editItem(category_id, items_id):
         return redirect(url_for('showItems', category_id=category_id))
     else:
         return render_template('edititem.html', category_id=category_id,
-                               i=editItem, c=categories)
+                               i=editItem, c=categories, creator=creator)
 
 
 @app.route('/categories/<int:category_id>/<items_id>/delete/',
@@ -413,18 +419,19 @@ def deleteItem(category_id, items_id):
     if 'username' not in login_session:
         return redirect('/login')
     category = session.query(Category).filter_by(id=category_id).first()
+    creator = getUserInfo(category.user_id)  # get creator info
     deleteItem = session.query(Item).filter_by(id=items_id).one()
     if login_session['user_id'] != category.user_id:
-        return "< script > function myFunction() {alert('You are not \
-                authorised to delete this item!');}</script> \
-                <body onload='myFunction()'' >"
+        return "<script>function myFunction() {alert\
+        ('You are not authorised to delete this item!');}\
+        </script><body onload='myFunction()'' >"
     if request.method == 'POST':
         session.delete(deleteItem)
         session.commit()
         return redirect(url_for('showItems', category_id=category_id))
     else:
         return render_template('deleteitem.html', category_id=category_id,
-                               i=deleteItem)
+                               i=deleteItem, creator=creator)
 
 
 # JSON APIs to view sports catalog

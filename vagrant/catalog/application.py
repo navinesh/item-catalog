@@ -415,8 +415,9 @@ def editItem(category_id, items_id):
         flash('Item %s successfully edited' % (editItem.name))
         return redirect(url_for('showItems', category_id=category_id))
     else:
-        return render_template('edititem.html', category_id=category_id,
-                               i=editItem, c=categories, creator=creator)
+        return render_template('edititem.html', category=category,
+                               i=editItem, categories=categories,
+                               creator=creator)
 
 
 @app.route('/categories/<int:category_id>/<items_id>/delete/',

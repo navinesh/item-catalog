@@ -1,7 +1,12 @@
 {% extends "main.html" %}
 {% block title %}New -tem - Sports catalog{% endblock %}
-{% block imageLink %}<img src="{{creator.picture}}" alt="Profile picture" class="img-circle" height="50" width="50">{% endblock %}
-{% block link %}<a href="/logout">Logout</a>{% endblock %}
+{% block head %}
+  <style type="text/css">
+    body {
+      padding-top: 100px;
+    }
+  </style>
+{% endblock %}
 {% block content %}
     <div class="row">
       <div class="col-md-offset-2 col-md-8">

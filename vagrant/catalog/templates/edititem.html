@@ -55,9 +55,11 @@
         								{{ c.name }}
         							</option>
                       {% endif %}
+                      {% if category.name != c.name %}
                       <option value="{{ c.id }}">
                         {{ c.name }}
                       </option>
+                      {% endif %}
                       {% endfor %}
                     </select>
                   </div>

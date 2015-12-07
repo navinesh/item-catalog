@@ -1,6 +1,12 @@
 {% extends "main.html" %}
 {% block title %}New category - Sports catalog{% endblock %}
-{% block link %}<a href="/logout">Logout</a>{% endblock %}
+{% block head %}
+  <style type="text/css">
+    body {
+      padding-top: 100px;
+    }
+  </style>
+{% endblock %}
 {% block content %}
     <div class="row">
       <div class="col-md-offset-2 col-md-8">

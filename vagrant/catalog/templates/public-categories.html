@@ -3,11 +3,23 @@
 {% block head %}
   <style type="text/css">
     body {
-      padding-top: 100px;
+      padding-top: 60px;
     }
   </style>
 {% endblock %}
 {% block content %}
+      <div class="row">
+        <div class="col-md-12">
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              {% for message in messages %}
+                <strong>{{ message }}</strong>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+          <br></br>
+        </div>
+      </div>
       <div class="row">
         <div class="col-md-2">
           <strong>CATEGORIES</strong>

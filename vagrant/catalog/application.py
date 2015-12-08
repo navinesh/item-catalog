@@ -51,11 +51,12 @@ def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
-    return render_template('login.html', STATE=state)  # render login template
+    # render login template
+    return render_template('login.html', STATE=state)
 
 
 @app.route('/gconnect', methods=['POST'])
-def googleConnect():
+def gConnect():
     """Handle calls sent back by call-back method"""
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state paramater'), 401)
@@ -150,7 +151,7 @@ def googleConnect():
 
 
 @app.route('/gdisconnect')
-def googleDisconnect():
+def gDisconnect():
     """Log out user, revoke current users' token and
     reset their login_session"""
     # only disconnect a connected user
@@ -177,8 +178,8 @@ def googleDisconnect():
 
 
 @app.route('/fbconnect', methods=['POST'])
-def facebookconnect():
-    """ Facebook login """
+def fbConnect():
+    """Facebook login"""
     # verify value of state to prevent cross-site request forgery
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state paramater.'), 401)
@@ -191,18 +192,17 @@ def facebookconnect():
         'web']['app_id']
     app_secret = json.loads(open('fb_client_secrets.json', 'r').read())[
         'web']['app_secret']
-    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s'\
-        % (app_id, app_secret, access_token)
+    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
+        app_id, app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
 
     # use token to get user info from API
-    userinfo_url = "https://graph.facebook.com/v2.2/me"
-
+    userinfo_url = "https://graph.facebook.com/v2.5/me"
     # strip expire tag from access token
     token = result.split("&")[0]
 
-    url = 'https://graph.facebook.com/v2.4/me?%s&fields=name,id,email' % token
+    url = 'https://graph.facebook.com/v2.5/me?%s&fields=name,id,email' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
@@ -211,9 +211,14 @@ def facebookconnect():
     login_session['email'] = data["email"]
     login_session['facebook_id'] = data["id"]
 
+    # token must be stored in the login_session in order to properly logout
+    # strip out the information before the equals sign in token
+    stored_token = token.split("=")[1]
+    login_session['access_token'] = stored_token
+
     # get user picture
-    url = 'https://graph.facebook.com/v2.4/me/picture?%s&redirect=0&height=200&width=200' % token
-    h - httplib2.Http()
+    url = 'https://graph.facebook.com/v2.5/me/picture?%s&redirect=0&height=200&width=200' % token
+    h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
     login_session['picture'] = data["data"]["url"]
@@ -239,12 +244,12 @@ def facebookconnect():
 
 
 @app.route('/fbdisconnect')
-def facebookdisconnect():
-    """ Facebook logout """
+def fbDisconnect():
+    """Facebook logout"""
     facebook_id = login_session['facebook_id']
     access_token = login_session['access_token']
-    url = 'https://graph.facebook.com/%s/permissions?access_token=%s'\
-        % (facebook_id, access_token)
+    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (
+        facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
     return "You have been logged out."
@@ -252,14 +257,14 @@ def facebookdisconnect():
 
 @app.route('/logout')
 def logout():
-    """ Logout logged-in user """
+    """Logout logged-in user"""
     if 'provider' in login_session:
         if login_session['provider'] == 'google':
-            googleDisconnect()
+            gDisconnect()
             del login_session['credentials']
             del login_session['gplus_id']
         if login_session['provider'] == 'facebook':
-            facebookdisconnect()
+            fbDisconnect()
             del login_session['facebook_id']
         del login_session['username']
         del login_session['email']

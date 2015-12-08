@@ -53,9 +53,11 @@
     <script>
       function signInCallback(authResult) {
         if (authResult['code']) {
-          // After successful authentication remove Google sign-in button
+          // after successful authentication remove Google sign-in button
           $('#signInButton').attr('style', 'display:none');
-          // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the home page
+          // send one-time-use code to the server, if the server responds
+          // write a 'login successful' message to the web page and then
+          // redirect back to the home page
           $.ajax({
             type: 'POST',
             url: '/gconnect?state={{STATE}}',

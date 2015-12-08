@@ -43,10 +43,9 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
-# Create anti-forgery state token
 @app.route('/login')
 def showLogin():
-    """Create a state token to prevent request forgery
+    """Create anti-forgery state token
     and store it in the session for later verification"""
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
@@ -57,7 +56,8 @@ def showLogin():
 
 @app.route('/gconnect', methods=['POST'])
 def gConnect():
-    """Handle calls sent back by call-back method"""
+    """Google login
+    Handle calls sent back by Google sign-in call-back method"""
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state paramater'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -170,7 +170,7 @@ def gDisconnect():
     result = h.request(url, 'GET')[0]
 
     if result['status'] != '200':
-        # If token was invalid
+        # if token was invalid
         response = make_response(json.dumps(
             'Failed to revoke token for given user', 400))
         response.headers['Content-Type'] = 'application/json'
@@ -257,7 +257,7 @@ def fbDisconnect():
 
 @app.route('/logout')
 def logout():
-    """Logout logged-in user"""
+    """Logout user"""
     if 'provider' in login_session:
         if login_session['provider'] == 'google':
             gDisconnect()

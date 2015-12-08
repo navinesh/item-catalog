@@ -114,9 +114,10 @@
           data: access_token,
           contentType: 'application/octet-stream; charset=utf-8',
           success: function(result) {
-            // handle or verify the server response if necessary.
+            // check if login was successful 
             if (result) {
               $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+            // redirect to categories page 4 seconds later
              setTimeout(function() {
               window.location.href = "/categories";
              }, 4000);

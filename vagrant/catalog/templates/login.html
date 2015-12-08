@@ -43,12 +43,10 @@
                 </span>
               </div>
               <div id="result"></div>
-              <br></br>
-              <button>
+              </br>
                 <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
                   <a href='javascript:sendTokenToServer()'>Login with Facebook</a>
                 </fb:login-button>
-              </button>
             </div>
           </div>
         </div>
@@ -107,37 +105,35 @@
         fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
 
-      function sendTokenToServer(){
+
+      function sendTokenToServer() {
         var access_token = FB.getAuthResponse()['accessToken'];
-        console.log('Welcome! Fetching your access token...');
         console.log(access_token)
-      FB.api('/me', function(response){
-        console.log('successful login for: ' + response.name);
-        $.ajax({
+        console.log('Welcome!  Fetching your information.... ');
+        FB.api('/me', function(response) {
+          console.log('Successful login for: ' + response.name);
+         $.ajax({
           type: 'POST',
           url: '/fbconnect?state={{STATE}}',
           processData: false,
           data: access_token,
           contentType: 'application/octet-stream; charset=utf-8',
-          success: function(result){
-            //handle or verify server response if necessary
-            if (result){
-              $('#result').html('Login successful!</br>' result + '</br>Redirecting...')
-              setTimeout(function(){
-                windows.location.href = "/categories";
-              }, 4000);
-            }
-            else if (authResult['error']){
-              console.log('There was an error: ' + authResult['error']);
-            }
-            else{
-              $('#result').html('Failed to make a server-side call. Check your configuration and console.');
-            }
-          }
-        });
-      });
-      }
+          success: function(result) {
+            // handle or verify the server response if necessary.
+            if (result) {
+              $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+             setTimeout(function() {
+              window.location.href = "/categories";
+             }, 4000);
 
+          } else {
+            $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+             }
+          }
+
+      });
+        });
+      }
     </script>
   </body>
 

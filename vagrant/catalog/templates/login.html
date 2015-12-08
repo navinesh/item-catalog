@@ -15,14 +15,11 @@
       body {
         padding-top: 100px;
       }
-
     </style>
 
     <!-- Load pre-requisites for Google sign-in -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script src="//apis.google.com/js/platform.js?onload=start">
-
-
     </script>
 
   </head>
@@ -80,7 +77,6 @@
           });
         }
       }
-
     </script>
 
     <!--Facebook login-->
@@ -93,7 +89,6 @@
           version: 'v2.5'
         });
       };
-
       (function(d, s, id) {
         var js, fjs = d.getElementsByTagName(s)[0];
         if (d.getElementById(id)) {
@@ -104,8 +99,6 @@
         js.src = "//connect.facebook.net/en_US/sdk.js";
         fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
-
-
       function sendTokenToServer() {
         var access_token = FB.getAuthResponse()['accessToken'];
         console.log(access_token)
@@ -125,12 +118,10 @@
              setTimeout(function() {
               window.location.href = "/categories";
              }, 4000);
-
           } else {
             $('#result').html('Failed to make a server-side call. Check your configuration and console.');
              }
           }
-
       });
         });
       }

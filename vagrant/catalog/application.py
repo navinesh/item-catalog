@@ -360,7 +360,7 @@ def editCategory(category_id):
     if editCategory.user_id != login_session['user_id']:
         return "<script>function myFunction() {alert\
         ('You are not authorised to edit this item!');}\
-        setTimeout(function() {window.location.href = '/categories';}, 4000);\
+        setTimeout(function() {window.location.href = '/categories';}, 2000);\
         </script><body onload='myFunction()'' >"
     if request.method == 'POST':
         if request.form['name']:
@@ -395,7 +395,7 @@ def deleteCategory(category_id):
     if deleteCategory.user_id != login_session['user_id']:
         return "<script>function myFunction() {alert\
         ('You are not authorised to delete this item!');}\
-        setTimeout(function() {window.location.href = '/categories';}, 4000);\
+        setTimeout(function() {window.location.href = '/categories';}, 2000);\
         </script><body onload='myFunction()'' >"
 
     if request.method == 'POST':
@@ -483,7 +483,7 @@ def newItem(category_id):
     if login_session['user_id'] != category.user_id:
         return "<script>function myFunction() {alert\
         ('You are not authorised to create new item for this category!');}\
-        setTimeout(function() {window.location.href = '/categories';}, 4000);\
+        setTimeout(function() {window.location.href = '/categories';}, 2000);\
         </script><body onload='myFunction()'' >"
     if request.method == 'POST':
         file = request.files['file']  # check if an image was posted
@@ -520,7 +520,7 @@ def editItem(category_id, items_id):
     if login_session['user_id'] != category.user_id:
         return "<script>function myFunction() {alert\
         ('You are not authorised to edit this item!');}\
-        setTimeout(function() {window.location.href = '/categories';}, 4000);\
+        setTimeout(function() {window.location.href = '/categories';}, 2000);\
         </script><body onload='myFunction()'' >"
     if request.method == 'POST':
         if request.form['name']:
@@ -567,7 +567,7 @@ def deleteItem(category_id, items_id):
     if login_session['user_id'] != category.user_id:
         return "<script>function myFunction() {alert\
         ('You are not authorised to delete this item!');}\
-        setTimeout(function() {window.location.href = '/categories';}, 4000);\
+        setTimeout(function() {window.location.href = '/categories';}, 2000);\
         </script><body onload='myFunction()'' >"
     if request.method == 'POST':
         session.delete(deleteItem)

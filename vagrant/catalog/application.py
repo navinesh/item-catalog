@@ -23,11 +23,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item, User
 
-
 # Declare client-id by referencing client secrets file
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())[
     'web']['client_id']
-
 
 # Directory to store images
 UPLOAD_FOLDER = 'uploads/'
@@ -44,8 +42,8 @@ session = DBSession()
 
 
 def csrfToken():
-    """Create anti-forgery state token and store it in session
-    for later verification"""
+    """Creates anti-forgery state token and stores it in session
+    for later verification."""
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
@@ -54,13 +52,11 @@ def csrfToken():
 
 @app.route('/login')
 def showLogin():
-    """Get anti-forgery state token saved in session and pass it to
-    login template.
+    """Passes anti-forgery state token saved in session to login template."""
 
-    Google and Facebook login functions will verify this token against
-    the token transmitted with the form data to prevent cross-site request
-    forgery.
-    """
+    # Google and Facebook login functions will verify this token against
+    # the token transmitted with the form data to prevent cross-site request
+    # forgery.
     state = csrfToken()
     # render login template
     return render_template('login.html', STATE=state)
@@ -70,6 +66,8 @@ def showLogin():
 def gConnect():
     """Google login
     Handle calls sent back by Google sign-in call-back method"""
+
+    # prevent cross-site request forgery
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state paramater'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -164,8 +162,11 @@ def gConnect():
 
 @app.route('/gdisconnect')
 def gDisconnect():
-    """Log out user, revoke current users' token and
-    reset their login_session"""
+    """Google logout
+
+    Logs out user, revokes users' token and
+    resets their login session"""
+
     # only disconnect a connected user
     credentials = login_session.get('credentials')
     if credentials is None:
@@ -181,8 +182,8 @@ def gDisconnect():
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
 
+    # if token was invalid
     if result['status'] != '200':
-        # if token was invalid
         response = make_response(json.dumps(
             'Failed to revoke token for given user', 400))
         response.headers['Content-Type'] = 'application/json'
@@ -192,6 +193,7 @@ def gDisconnect():
 @app.route('/fbconnect', methods=['POST'])
 def fbConnect():
     """Facebook login"""
+
     # verify value of state to prevent cross-site request forgery
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state paramater.'), 401)
@@ -211,6 +213,7 @@ def fbConnect():
 
     # use token to get user info from API
     userinfo_url = "https://graph.facebook.com/v2.5/me"
+
     # strip expire tag from access token
     token = result.split("&")[0]
 
@@ -257,7 +260,10 @@ def fbConnect():
 
 @app.route('/fbdisconnect')
 def fbDisconnect():
-    """Facebook logout"""
+    """Facebook logout
+
+    Logs out user, revokes users' token and
+    resets their login session"""
     facebook_id = login_session['facebook_id']
     access_token = login_session['access_token']
     url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (
@@ -291,7 +297,7 @@ def logout():
 
 
 def createUser(login_session):
-    """Get logged-in user info to create new user in database"""
+    """Fetches logged-in user info to create new user in database"""
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
     session.add(newUser)
@@ -301,14 +307,14 @@ def createUser(login_session):
 
 
 def getUserInfo(user_id):
-    """Return user object associated with user ID"""
+    """Retrieves user object associated with user ID"""
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
 
 def getUserID(email):
-    """Return ID number of a user if email address belongs to
-    a user in the database. Return none if it does not exist"""
+    """Retrieves ID number of a user if email address belongs to
+    a user in the database."""
     try:
         user = session.query(User).filter_by(email=email).one()
         return user.id
@@ -319,7 +325,7 @@ def getUserID(email):
 @app.route('/')
 @app.route('/categories/')
 def showCategories():
-    """Display all categories and its items"""
+    """Fetches all categories and its items"""
     categories = session.query(Category).all()
     items = session.query(Item).all()
     if 'username' not in login_session:
@@ -334,10 +340,12 @@ def showCategories():
 
 @app.route('/categories/new/', methods=['GET', 'POST'])
 def newCategory():
-    """Add new category to the database"""
-    # check if user is logged in
+    """Adds new category to the database"""
+
+    # checks for any logged-in user
     if 'username' not in login_session:
         return redirect('/login')
+
     if request.method == 'POST':
         newCategory = Category(
             name=request.form['name'], user_id=login_session['user_id'])
@@ -352,16 +360,22 @@ def newCategory():
 @app.route('/categories/<int:category_id>/edit/', methods=['GET', 'POST'])
 def editCategory(category_id):
     """Edit category"""
-    # check if user is logged in
+
+    # checks for any logged-in user
     if 'username' not in login_session:
         return redirect('/login')
+
     editCategory = session.query(Category).filter_by(id=category_id).one()
     creator = getUserInfo(editCategory.user_id)  # get creator info
+
+    # verifies if logged-in user created this category
     if editCategory.user_id != login_session['user_id']:
         return "<script>function myFunction() {alert\
         ('You are not authorised to edit this item!');}\
         setTimeout(function() {window.location.href = '/categories';}, 2000);\
         </script><body onload='myFunction()'' >"
+
+    # fetches form data
     if request.method == 'POST':
         if request.form['name']:
             editCategory.name = request.form['name']
@@ -377,10 +391,12 @@ def editCategory(category_id):
 @app.route('/categories/<int:category_id>/delete/', methods=['GET', 'POST'])
 def deleteCategory(category_id):
     """Delete category"""
-    # check if user is logged in
+
+    # checks for any logged-in user
     if 'username' not in login_session:
         return redirect('/login')
-    # prevent cross-site request forgery
+
+    # prevents cross-site request forgery
     if request.method == 'POST':
         if request.form['state']:
             if request.form['state'] != login_session['state']:
@@ -391,20 +407,22 @@ def deleteCategory(category_id):
 
     deleteCategory = session.query(Category).filter_by(id=category_id).one()
     creator = getUserInfo(deleteCategory.user_id)  # get creator info
-    # check if logged-in user created this category
+
+    # verifies if logged-in user created this category
     if deleteCategory.user_id != login_session['user_id']:
         return "<script>function myFunction() {alert\
         ('You are not authorised to delete this item!');}\
         setTimeout(function() {window.location.href = '/categories';}, 2000);\
         </script><body onload='myFunction()'' >"
 
+    # fetches form data
     if request.method == 'POST':
         session.delete(deleteCategory)
         session.commit()
         flash('Categiry %s successfully deleted' % (deleteCategory.name))
         return redirect(url_for('showCategories'))
     else:
-        # get anti-forgery state token from session
+        # retrieves anti-forgery state token from session
         state = csrfToken()
         return render_template('deletecategory.html', i=deleteCategory,
                                creator=creator, STATE=state)
@@ -413,29 +431,32 @@ def deleteCategory(category_id):
 @app.route('/<filename>/')
 @app.route('/categories/<filename>/')
 def uploaded_Image(filename):
-    """Serve uploaded images for home page"""
+    """Serves uploaded images for home page view"""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route('/categories/<int:category_id>/items/<filename>/')
 def uploaded_showImage(filename, category_id):
-    """Serve uploaded images for category view"""
+    """Serves uploaded images for category view"""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route('/categories/<int:category_id>/<items_id>/<filename>/')
 @app.route('/categories/<int:category_id>/<items_id>/edit/<filename>')
 def uploaded_editImage(filename, category_id, items_id):
-    """Serve uploaded image for edit"""
+    """Serves uploaded image for editing"""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route('/categories/<int:category_id>/<items_id>/')
 def showItem(items_id, category_id):
-    """Display details of single item"""
+    """Retrieves details of single item"""
     category = session.query(Category).filter_by(id=category_id).first()
     item = session.query(Item).filter_by(id=items_id).one()
     creator = getUserInfo(category.user_id)  # get creator info
+
+    # checks for any logged-in user and
+    # verifies if logged-in user created this category
     if 'username' not in login_session or \
             creator.id != login_session['user_id']:
         return render_template('public-item.html', category=category,
@@ -448,15 +469,13 @@ def showItem(items_id, category_id):
 @app.route('/categories/<int:category_id>/')
 @app.route('/categories/<int:category_id>/items/')
 def showItems(category_id):
-    """Display all item in each category
-
-    If a user is not logged-in or logged-in user is not the creator of the
-    item then render public template otherwise logged-in user is the creator
-    of the item so we render template with edit/delete item option
-    """
+    """Retrieves all items in each category"""
     category = session.query(Category).filter_by(id=category_id).first()
     items = session.query(Item).filter_by(category_id=category_id)
     creator = getUserInfo(category.user_id)  # get creator info
+
+    # checks for any logged-in user and
+    # verifies if logged-in user created this category
     if 'username' not in login_session or \
             creator.id != login_session['user_id']:
         return render_template('public-items.html', category=category,

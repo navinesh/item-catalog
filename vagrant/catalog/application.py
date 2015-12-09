@@ -29,6 +29,7 @@ CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())[
 
 # Directory to store images
 UPLOAD_FOLDER = 'uploads/'
+
 # Image extensions allowed to be uploaded
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
@@ -67,7 +68,7 @@ def gConnect():
     """Google login
     Handle calls sent back by Google sign-in call-back method"""
 
-    # prevent cross-site request forgery
+    # verify value of state to prevent cross-site request forgery
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state paramater'), 401)
         response.headers['Content-Type'] = 'application/json'
@@ -346,6 +347,7 @@ def newCategory():
     if 'username' not in login_session:
         return redirect('/login')
 
+    # fetches form data
     if request.method == 'POST':
         newCategory = Category(
             name=request.form['name'], user_id=login_session['user_id'])
@@ -359,7 +361,7 @@ def newCategory():
 
 @app.route('/categories/<int:category_id>/edit/', methods=['GET', 'POST'])
 def editCategory(category_id):
-    """Edit category"""
+    """Edits category"""
 
     # checks for any logged-in user
     if 'username' not in login_session:
@@ -390,7 +392,7 @@ def editCategory(category_id):
 
 @app.route('/categories/<int:category_id>/delete/', methods=['GET', 'POST'])
 def deleteCategory(category_id):
-    """Delete category"""
+    """Deletes category"""
 
     # checks for any logged-in user
     if 'username' not in login_session:
@@ -426,26 +428,6 @@ def deleteCategory(category_id):
         state = csrfToken()
         return render_template('deletecategory.html', i=deleteCategory,
                                creator=creator, STATE=state)
-
-
-@app.route('/<filename>/')
-@app.route('/categories/<filename>/')
-def uploaded_Image(filename):
-    """Serves uploaded images for home page view"""
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-
-@app.route('/categories/<int:category_id>/items/<filename>/')
-def uploaded_showImage(filename, category_id):
-    """Serves uploaded images for category view"""
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-
-@app.route('/categories/<int:category_id>/<items_id>/<filename>/')
-@app.route('/categories/<int:category_id>/<items_id>/edit/<filename>')
-def uploaded_editImage(filename, category_id, items_id):
-    """Serves uploaded image for editing"""
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route('/categories/<int:category_id>/<items_id>/')
@@ -485,25 +467,25 @@ def showItems(category_id):
                                creator=creator)
 
 
-def allowed_file(filename):
-    """Check if an image extension is allowed"""
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
-
-
 @app.route('/categories/<int:category_id>/items/new/', methods=['GET', 'POST'])
 def newItem(category_id):
-    """Create a new item for a particular category"""
-    # check if user is logged in
+    """Creates a new item for a particular category"""
+
+    # checks for any logged-in user
     if 'username' not in login_session:
         return redirect('/login')
+
     category = session.query(Category).filter_by(id=category_id).first()
     creator = getUserInfo(category.user_id)  # get creator info
+
+    # verifies if logged-in user created this category
     if login_session['user_id'] != category.user_id:
         return "<script>function myFunction() {alert\
         ('You are not authorised to create new item for this category!');}\
         setTimeout(function() {window.location.href = '/categories';}, 2000);\
         </script><body onload='myFunction()'' >"
+
+    # fetches form data
     if request.method == 'POST':
         file = request.files['file']  # check if an image was posted
         if file and allowed_file(file.filename):  # check extension
@@ -529,18 +511,24 @@ def newItem(category_id):
            methods=['GET', 'POST'])
 def editItem(category_id, items_id):
     """Edit an item of a particular category"""
-    # check if user is logged in
+
+    # checks for any logged-in user
     if 'username' not in login_session:
         return redirect('/login')
+
     categories = session.query(Category).all()
     category = session.query(Category).filter_by(id=category_id).first()
     creator = getUserInfo(category.user_id)  # get creator info
     editItem = session.query(Item).filter_by(id=items_id).one()
+
+    # verifies if logged-in user created this category
     if login_session['user_id'] != category.user_id:
         return "<script>function myFunction() {alert\
         ('You are not authorised to edit this item!');}\
         setTimeout(function() {window.location.href = '/categories';}, 2000);\
         </script><body onload='myFunction()'' >"
+
+    # fetches form data
     if request.method == 'POST':
         if request.form['name']:
             editItem.name = request.form['name']
@@ -567,11 +555,12 @@ def editItem(category_id, items_id):
            methods=['GET', 'POST'])
 def deleteItem(category_id, items_id):
     """Delete an item of a particular category"""
-    # check if user is logged in
+
+    # checks for any logged-in user
     if 'username' not in login_session:
         return redirect('/login')
 
-    # prevent cross-site request forgery
+    # prevents cross-site request forgery
     if request.method == 'POST':
         if request.form['state']:
             if request.form['state'] != login_session['state']:
@@ -583,21 +572,52 @@ def deleteItem(category_id, items_id):
     category = session.query(Category).filter_by(id=category_id).first()
     creator = getUserInfo(category.user_id)  # get creator info
     deleteItem = session.query(Item).filter_by(id=items_id).one()
+
+    # verifies if logged-in user created this category
     if login_session['user_id'] != category.user_id:
         return "<script>function myFunction() {alert\
         ('You are not authorised to delete this item!');}\
         setTimeout(function() {window.location.href = '/categories';}, 2000);\
         </script><body onload='myFunction()'' >"
+
+    # fetches form data
     if request.method == 'POST':
         session.delete(deleteItem)
         session.commit()
         flash('Item %s successfully deleted' % (deleteItem.name))
         return redirect(url_for('showItems', category_id=category_id))
     else:
-        # get anti-forgery state token from session
+        # retrieves anti-forgery state token from session
         state = csrfToken()
         return render_template('deleteitem.html', category_id=category_id,
                                i=deleteItem, creator=creator, STATE=state)
+
+
+# Image functions
+@app.route('/<filename>/')
+@app.route('/categories/<filename>/')
+def showImageHome(filename):
+    """Serves uploaded images for home page view"""
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+@app.route('/categories/<int:category_id>/items/<filename>/')
+def showImage(filename, category_id):
+    """Serves uploaded images for category view"""
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+@app.route('/categories/<int:category_id>/<items_id>/<filename>/')
+@app.route('/categories/<int:category_id>/<items_id>/edit/<filename>')
+def editImage(filename, category_id, items_id):
+    """Serves uploaded image for editing"""
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+def allowed_file(filename):
+    """Check if an image extension is allowed"""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
 # XML API to view sports catalog

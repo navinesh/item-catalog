@@ -43,13 +43,25 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
-@app.route('/login')
-def showLogin():
-    """Create anti-forgery state token
-    and store it in the session for later verification"""
+def csrfToken():
+    """Create anti-forgery state token and store it in session
+    for later verification"""
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
+    return state
+
+
+@app.route('/login')
+def showLogin():
+    """Get anti-forgery state token saved in session and pass it to
+    login template.
+
+    Google and Facebook login functions will verify this token against
+    the token transmitted with the form data to prevent cross-site request
+    forgery.
+    """
+    state = csrfToken()
     # render login template
     return render_template('login.html', STATE=state)
 
@@ -348,6 +360,7 @@ def editCategory(category_id):
     if editCategory.user_id != login_session['user_id']:
         return "<script>function myFunction() {alert\
         ('You are not authorised to edit this item!');}\
+        setTimeout(function() {window.location.href = '/categories';}, 4000);\
         </script><body onload='myFunction()'' >"
     if request.method == 'POST':
         if request.form['name']:
@@ -367,20 +380,34 @@ def deleteCategory(category_id):
     # check if user is logged in
     if 'username' not in login_session:
         return redirect('/login')
+    # prevent cross-site request forgery
+    if request.method == 'POST':
+        if request.form['state']:
+            if request.form['state'] != login_session['state']:
+                response = make_response(json.dumps(
+                    'Invalid state paramater'), 401)
+                response.headers['Content-Type'] = 'application/json'
+                return response
+
     deleteCategory = session.query(Category).filter_by(id=category_id).one()
     creator = getUserInfo(deleteCategory.user_id)  # get creator info
+    # check if logged-in user created this category
     if deleteCategory.user_id != login_session['user_id']:
-        return "< script > function myFunction() {alert('You are not \
-                authorised to edit this item!');}</script> \
-                <body onload='myFunction()'' >"
+        return "<script>function myFunction() {alert\
+        ('You are not authorised to delete this item!');}\
+        setTimeout(function() {window.location.href = '/categories';}, 4000);\
+        </script><body onload='myFunction()'' >"
+
     if request.method == 'POST':
         session.delete(deleteCategory)
         session.commit()
         flash('Categiry %s successfully deleted' % (deleteCategory.name))
         return redirect(url_for('showCategories'))
     else:
+        # get anti-forgery state token from session
+        state = csrfToken()
         return render_template('deletecategory.html', i=deleteCategory,
-                               creator=creator)
+                               creator=creator, STATE=state)
 
 
 @app.route('/<filename>/')
@@ -454,8 +481,9 @@ def newItem(category_id):
     category = session.query(Category).filter_by(id=category_id).first()
     creator = getUserInfo(category.user_id)  # get creator info
     if login_session['user_id'] != category.user_id:
-        return "<script>function myFunction(){alert \
-        ('You are not authorised to create new item for this category!');} \
+        return "<script>function myFunction() {alert\
+        ('You are not authorised to create new item for this category!');}\
+        setTimeout(function() {window.location.href = '/categories';}, 4000);\
         </script><body onload='myFunction()'' >"
     if request.method == 'POST':
         file = request.files['file']  # check if an image was posted
@@ -492,6 +520,7 @@ def editItem(category_id, items_id):
     if login_session['user_id'] != category.user_id:
         return "<script>function myFunction() {alert\
         ('You are not authorised to edit this item!');}\
+        setTimeout(function() {window.location.href = '/categories';}, 4000);\
         </script><body onload='myFunction()'' >"
     if request.method == 'POST':
         if request.form['name']:
@@ -522,12 +551,23 @@ def deleteItem(category_id, items_id):
     # check if user is logged in
     if 'username' not in login_session:
         return redirect('/login')
+
+    # prevent cross-site request forgery
+    if request.method == 'POST':
+        if request.form['state']:
+            if request.form['state'] != login_session['state']:
+                response = make_response(json.dumps(
+                    'Invalid state paramater'), 401)
+                response.headers['Content-Type'] = 'application/json'
+                return response
+
     category = session.query(Category).filter_by(id=category_id).first()
     creator = getUserInfo(category.user_id)  # get creator info
     deleteItem = session.query(Item).filter_by(id=items_id).one()
     if login_session['user_id'] != category.user_id:
         return "<script>function myFunction() {alert\
         ('You are not authorised to delete this item!');}\
+        setTimeout(function() {window.location.href = '/categories';}, 4000);\
         </script><body onload='myFunction()'' >"
     if request.method == 'POST':
         session.delete(deleteItem)
@@ -535,8 +575,18 @@ def deleteItem(category_id, items_id):
         flash('Item %s successfully deleted' % (deleteItem.name))
         return redirect(url_for('showItems', category_id=category_id))
     else:
+        # get anti-forgery state token from session
+        state = csrfToken()
         return render_template('deleteitem.html', category_id=category_id,
-                               i=deleteItem, creator=creator)
+                               i=deleteItem, creator=creator, STATE=state)
+
+
+# XML API to view sports catalog
+@app.route('/catalog.xml/')
+def catalogXML():
+    categories = session.query(Category).all()
+    items = session.query(Item).all()
+    render_template('catalog.xml', categories=categories, items=items)
 
 
 # JSON APIs to view sports catalog
@@ -568,7 +618,8 @@ def categoryItemsJSON(category_id, items_id):
 
 @app.errorhandler(404)
 def page_not_found(error):
-    """redirect user if a page does not exist"""
+    """Redirect user to error page if requested
+    page does not exist"""
     return render_template('error.html'), 404
 
 

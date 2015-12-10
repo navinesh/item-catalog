@@ -347,6 +347,15 @@ def newCategory():
     if 'username' not in login_session:
         return redirect('/login')
 
+    # prevents cross-site request forgery
+    if request.method == 'POST':
+        if request.form['state']:
+            if request.form['state'] != login_session['state']:
+                response = make_response(json.dumps(
+                    'Invalid state paramater'), 401)
+                response.headers['Content-Type'] = 'application/json'
+                return response
+
     # fetches form data
     if request.method == 'POST':
         newCategory = Category(
@@ -366,6 +375,15 @@ def editCategory(category_id):
     # checks for any logged-in user
     if 'username' not in login_session:
         return redirect('/login')
+
+    # prevents cross-site request forgery
+    if request.method == 'POST':
+        if request.form['state']:
+            if request.form['state'] != login_session['state']:
+                response = make_response(json.dumps(
+                    'Invalid state paramater'), 401)
+                response.headers['Content-Type'] = 'application/json'
+                return response
 
     editCategory = session.query(Category).filter_by(id=category_id).one()
     creator = getUserInfo(editCategory.user_id)  # get creator info
@@ -475,6 +493,15 @@ def newItem(category_id):
     if 'username' not in login_session:
         return redirect('/login')
 
+    # prevents cross-site request forgery
+    if request.method == 'POST':
+        if request.form['state']:
+            if request.form['state'] != login_session['state']:
+                response = make_response(json.dumps(
+                    'Invalid state paramater'), 401)
+                response.headers['Content-Type'] = 'application/json'
+                return response
+
     category = session.query(Category).filter_by(id=category_id).first()
     creator = getUserInfo(category.user_id)  # get creator info
 
@@ -515,6 +542,15 @@ def editItem(category_id, items_id):
     # checks for any logged-in user
     if 'username' not in login_session:
         return redirect('/login')
+
+    # prevents cross-site request forgery
+    if request.method == 'POST':
+        if request.form['state']:
+            if request.form['state'] != login_session['state']:
+                response = make_response(json.dumps(
+                    'Invalid state paramater'), 401)
+                response.headers['Content-Type'] = 'application/json'
+                return response
 
     categories = session.query(Category).all()
     category = session.query(Category).filter_by(id=category_id).first()

@@ -20,7 +20,7 @@ from flask import make_response  # convert return value from function to object
 import requests  # Apache2 HTTP library that send HTTP/1.1 requests
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, join
 from database_setup import Base, Category, Item, User
 
 # Declare client-id by referencing client secrets file
@@ -621,14 +621,32 @@ def allowed_file(filename):
 
 
 # XML API to view sports catalog
-@app.route('/catalog.xml/')
+@app.route('/catalog.xml/', methods=['GET'])
 def catalogXML():
     categories = session.query(Category).all()
     items = session.query(Item).all()
-    render_template('catalog.xml', categories=categories, items=items)
+
+    catalog_xml = render_template(
+        'catalog.xml', categories=categories, items=items)
+    response = make_response(catalog_xml)
+    response.headers["Content-Type"] = "application/xml"
+    return response
 
 
 # JSON APIs to view sports catalog
+@app.route('/catalogs.json/')
+def catalogsJSON():
+    q = session.query(Category, Item).join(
+        Item).filter(Category.id == Item.category_id).all()
+
+    # return render_template('test.html', query=q)
+    # return jsonify(id=q.Category.id, name=q.Category.name,
+    # itemid=q.Item.id, itemname=q.Item.name,
+    # description=q.Item.description,
+    # url=q.Item.url, category_id=q.Item.category_id)
+    return json.dumps(list)
+
+
 @app.route('/catalog.json/')
 def catalogJSON():
     categories = session.query(Category).all()
@@ -637,15 +655,15 @@ def catalogJSON():
                    Items=[i.serialize for i in items])
 
 
-@app.route('/categories/json/')
+@app.route('/categories.json/')
 def categoriesJSON():
     categories = session.query(Category).all()
     return jsonify(Categories=[c.serialize for c in categories])
 
 
-@app.route('/categories/<int:category_id>/items/json/')
-def categoryItemJSON(category_id):
-    items = session.query(Item).filter_by(category_id=category_id).all()
+@app.route('/items.json/')
+def categoryItemJSON():
+    items = session.query(Item).all()
     return jsonify(Items=[i.serialize for i in items])
 
 

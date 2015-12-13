@@ -670,39 +670,37 @@ def catalogXML():
 
 
 # JSON APIs to view sports catalog
-@app.route('/catalogs.json/')
-def catalogsJSON():
-    q = session.query(Category, Item).join(
-        Item).filter(Category.id == Item.category_id).all()
 
-    # return render_template('test.html', query=q)
-    # return jsonify(id=q.Category.id, name=q.Category.name,
-    # itemid=q.Item.id, itemname=q.Item.name,
-    # description=q.Item.description,
-    # url=q.Item.url, category_id=q.Item.category_id)
-    return json.dumps(list)
-
-
+# JSON categories and items  view
 @app.route('/catalog.json/')
 def catalogJSON():
     categories = session.query(Category).all()
-    items = session.query(Item).all()
-    return jsonify(Categories=[c.serialize for c in categories],
-                   Items=[i.serialize for i in items])
+    categoryList = []
+    itemList = []
+    for c in categories:
+        category = c.serialize
+        for i in c.items:
+            itemList.append(i.serialize)
+        category['items'] = itemList
+        categoryList.append(category)
+    return jsonify(Categories=[categoryList])
 
 
+# JSON categories view
 @app.route('/categories.json/')
 def categoriesJSON():
     categories = session.query(Category).all()
     return jsonify(Categories=[c.serialize for c in categories])
 
 
+# JSON items view
 @app.route('/items.json/')
 def categoryItemJSON():
     items = session.query(Item).all()
     return jsonify(Items=[i.serialize for i in items])
 
 
+# JSON single item view
 @app.route('/categories/<int:category_id>/items/<int:items_id>/json/')
 def categoryItemsJSON(category_id, items_id):
     items = session.query(Item).filter_by(id=items_id).one()

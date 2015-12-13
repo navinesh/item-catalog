@@ -94,7 +94,7 @@ def gConnect():
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
            % access_token)
     h = httplib2.Http()
-    result = json.loads(h.request(url, 'GET')[1])
+    result = json.loads(h.req                                                                                                                        uest(url, 'GET')[1])
 
     # if there was error in access token info then abort
     if result.get('error') is not None:
@@ -342,7 +342,7 @@ def showCategories():
 
 @app.route('/categories/new/', methods=['GET', 'POST'])
 def newCategory():
-    """Adds new category to the database."""
+    """Creates new category."""
 
     # checks for any logged-in user
     if 'username' not in login_session:

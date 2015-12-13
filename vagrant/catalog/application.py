@@ -65,8 +65,9 @@ def showLogin():
 
 @app.route('/gconnect', methods=['POST'])
 def gConnect():
-    """Google login
-    Handle calls sent back by Google sign-in call-back method"""
+    """Google login.
+
+    Handle calls sent back by Google sign-in call-back method."""
 
     # verify value of state to prevent cross-site request forgery
     if request.args.get('state') != login_session['state']:
@@ -163,10 +164,10 @@ def gConnect():
 
 @app.route('/gdisconnect')
 def gDisconnect():
-    """Google logout
+    """Google logout.
 
     Logs out user, revokes users' token and
-    resets their login session"""
+    resets their login session."""
 
     # only disconnect a connected user
     credentials = login_session.get('credentials')
@@ -193,7 +194,7 @@ def gDisconnect():
 
 @app.route('/fbconnect', methods=['POST'])
 def fbConnect():
-    """Facebook login"""
+    """Facebook login."""
 
     # verify value of state to prevent cross-site request forgery
     if request.args.get('state') != login_session['state']:
@@ -261,10 +262,10 @@ def fbConnect():
 
 @app.route('/fbdisconnect')
 def fbDisconnect():
-    """Facebook logout
+    """Facebook logout.
 
     Logs out user, revokes users' token and
-    resets their login session"""
+    resets their login session."""
     facebook_id = login_session['facebook_id']
     access_token = login_session['access_token']
     url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (
@@ -276,7 +277,7 @@ def fbDisconnect():
 
 @app.route('/logout')
 def logout():
-    """Logout user"""
+    """Logout user."""
     if 'provider' in login_session:
         if login_session['provider'] == 'google':
             gDisconnect()
@@ -298,7 +299,7 @@ def logout():
 
 
 def createUser(login_session):
-    """Fetches logged-in user info to create new user in database"""
+    """Fetches logged-in user info to create new user in database."""
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
     session.add(newUser)
@@ -308,7 +309,7 @@ def createUser(login_session):
 
 
 def getUserInfo(user_id):
-    """Retrieves user object associated with user ID"""
+    """Retrieves user object associated with user ID."""
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
@@ -326,7 +327,7 @@ def getUserID(email):
 @app.route('/')
 @app.route('/categories/')
 def showCategories():
-    """Fetches all categories and its items"""
+    """Fetches all categories and its items."""
     categories = session.query(Category).all()
     items = session.query(Item).all()
     if 'username' not in login_session:
@@ -341,7 +342,7 @@ def showCategories():
 
 @app.route('/categories/new/', methods=['GET', 'POST'])
 def newCategory():
-    """Adds new category to the database"""
+    """Adds new category to the database."""
 
     # checks for any logged-in user
     if 'username' not in login_session:
@@ -370,7 +371,7 @@ def newCategory():
 
 @app.route('/categories/<int:category_id>/edit/', methods=['GET', 'POST'])
 def editCategory(category_id):
-    """Edits category"""
+    """Edits category."""
 
     # checks for any logged-in user
     if 'username' not in login_session:
@@ -410,7 +411,7 @@ def editCategory(category_id):
 
 @app.route('/categories/<int:category_id>/delete/', methods=['GET', 'POST'])
 def deleteCategory(category_id):
-    """Deletes category"""
+    """Deletes category."""
 
     # checks for any logged-in user
     if 'username' not in login_session:
@@ -450,7 +451,7 @@ def deleteCategory(category_id):
 
 @app.route('/categories/<int:category_id>/<items_id>/')
 def showItem(items_id, category_id):
-    """Retrieves details of single item"""
+    """Retrieves details of single item."""
     category = session.query(Category).filter_by(id=category_id).first()
     item = session.query(Item).filter_by(id=items_id).one()
     creator = getUserInfo(category.user_id)  # get creator info
@@ -469,7 +470,7 @@ def showItem(items_id, category_id):
 @app.route('/categories/<int:category_id>/')
 @app.route('/categories/<int:category_id>/items/')
 def showItems(category_id):
-    """Retrieves all items in each category"""
+    """Retrieves all items in each category."""
     category = session.query(Category).filter_by(id=category_id).first()
     items = session.query(Item).filter_by(category_id=category_id)
     creator = getUserInfo(category.user_id)  # get creator info
@@ -487,7 +488,7 @@ def showItems(category_id):
 
 @app.route('/categories/<int:category_id>/items/new/', methods=['GET', 'POST'])
 def newItem(category_id):
-    """Creates a new item for a particular category"""
+    """Creates a new item for a particular category."""
 
     # checks for any logged-in user
     if 'username' not in login_session:
@@ -537,7 +538,7 @@ def newItem(category_id):
 @app.route('/categories/<int:category_id>/<items_id>/edit/',
            methods=['GET', 'POST'])
 def editItem(category_id, items_id):
-    """Edit an item of a particular category"""
+    """Edit an item of a particular category."""
 
     # checks for any logged-in user
     if 'username' not in login_session:
@@ -590,7 +591,7 @@ def editItem(category_id, items_id):
 @app.route('/categories/<int:category_id>/<items_id>/delete/',
            methods=['GET', 'POST'])
 def deleteItem(category_id, items_id):
-    """Delete an item of a particular category"""
+    """Delete an item of a particular category."""
 
     # checks for any logged-in user
     if 'username' not in login_session:
@@ -633,25 +634,25 @@ def deleteItem(category_id, items_id):
 @app.route('/<filename>/')
 @app.route('/categories/<filename>/')
 def showImageHome(filename):
-    """Serves uploaded images for home page view"""
+    """Serves uploaded images for home page view."""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route('/categories/<int:category_id>/items/<filename>/')
 def showImage(filename, category_id):
-    """Serves uploaded images for category view"""
+    """Serves uploaded images for category view."""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 @app.route('/categories/<int:category_id>/<items_id>/<filename>/')
 @app.route('/categories/<int:category_id>/<items_id>/edit/<filename>')
 def editImage(filename, category_id, items_id):
-    """Serves uploaded image for editing"""
+    """Serves uploaded image for editing."""
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
 def allowed_file(filename):
-    """Check if an image extension is allowed"""
+    """Check if an image extension is allowed."""
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
@@ -710,7 +711,7 @@ def categoryItemsJSON(category_id, items_id):
 @app.errorhandler(404)
 def page_not_found(error):
     """Redirect user to error page if requested
-    page does not exist"""
+    page does not exist."""
     return render_template('error.html'), 404
 
 

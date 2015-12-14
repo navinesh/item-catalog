@@ -55,7 +55,7 @@ class Item(Base):
             'name': self.name,
             'description': self.description,
             'category-id': self.category_id,
-            'url': self.url,
+            'image-name': self.url,
         }
 
 

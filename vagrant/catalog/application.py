@@ -94,7 +94,7 @@ def gConnect():
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
            % access_token)
     h = httplib2.Http()
-    result = json.loads(h.req                                                                                                                        uest(url, 'GET')[1])
+    result = json.loads(h.request(url, 'GET')[1])
 
     # if there was error in access token info then abort
     if result.get('error') is not None:
@@ -661,25 +661,22 @@ def allowed_file(filename):
 @app.route('/catalog.xml/', methods=['GET'])
 def catalogXML():
     categories = session.query(Category).all()
-    items = session.query(Item).all()
-
     catalog_xml = render_template(
-        'catalog.xml', categories=categories, items=items)
+        'catalog.xml', Categories=categories)
     response = make_response(catalog_xml)
     response.headers["Content-Type"] = "application/xml"
     return response
 
 
 # JSON APIs to view sports catalog
-
-# JSON categories and items  view
+# JSON categories and items view
 @app.route('/catalog.json/')
 def catalogJSON():
     categories = session.query(Category).all()
     categoryList = []
-    itemList = []
     for c in categories:
         category = c.serialize
+        itemList = []
         for i in c.items:
             itemList.append(i.serialize)
         category['items'] = itemList

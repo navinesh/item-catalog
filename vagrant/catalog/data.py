@@ -1,3 +1,4 @@
+# Create dummy data
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -40,12 +41,13 @@ Item1 = Item(user_id=1, name="Soccer boot", description="Football boots, called 
 session.add(Item1)
 session.commit()
 
-
+# Create category
 category2 = Category(user_id=1, name="Rugby")
 
 session.add(category2)
 session.commit()
 
+# Create items
 Item2 = Item(user_id=1, name="Rugby jersey", description="A rugby shirt is a shirt worn by players of rugby union or rugby league. It usually has short sleeves, though long sleeves are common as well.",
              url="rugby_jersey.jpg", category=category2)
 
@@ -58,23 +60,26 @@ Item1 = Item(user_id=1, name="Rugby ball", description="A rugby ball, originally
 session.add(Item1)
 session.commit()
 
-
+# Create category
 category3 = Category(user_id=1, name="Basket ball")
 
 session.add(category3)
 session.commit()
 
+# Create items
 Item1 = Item(user_id=1, name="Basketball", description="A basketball is a spherical inflated ball used in a game of basketball.",
              url="basketball.png", category=category3)
 
 session.add(Item1)
 session.commit()
 
+# Create category
 category4 = Category(user_id=1, name="Tennis")
 
 session.add(category4)
 session.commit()
 
+# Create items
 Item1 = Item(user_id=1, name="Tennis racquet", description="A racket or racquet is a sports implement consisting of a handled frame with an open hoop across which a network of strings or catgut is stretched tightly.",
              url="Tennis_racquet.jpg", category=category4)
 

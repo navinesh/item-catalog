@@ -309,14 +309,13 @@ def createUser(login_session):
 
 
 def getUserInfo(user_id):
-    """Retrieves user object associated with user ID."""
+    """Retrieves user object associated with the user ID."""
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
 
 def getUserID(email):
-    """Retrieves ID number of a user if email address belongs to
-    a user in the database."""
+    """Retrieves user ID number from the database."""
     try:
         user = session.query(User).filter_by(email=email).one()
         return user.id

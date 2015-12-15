@@ -16,6 +16,9 @@ catalog/
 ├──application.py
 ├──database_setup.py
 ├──db.sql
+├──data.py
+├──client_secrets.json
+├──fb_client_secrets.json
 ├──static/
 ├──templates/
 ├──uploads/
@@ -28,7 +31,8 @@ catalog/
 4. Once it is up and running, type `vagrant ssh` to log into it
 5. Change directory to **vagrant/catalog** (cd /vagrant/catalog)
 6. Run the command `psql -f db.sql` to create the database
-7. Run the command `python application.py` to run the application
+7. Run the command `python data.py` to create dummy data
+8. Run the command `python application.py` to run the application
 
 ##Extra Credit Description
 - JSON and XML APIs

@@ -6,6 +6,32 @@
       padding-top: 60px;
     }
   </style>
+  <script type="text/javascript">// <![CDATA[
+    $(window).load(function(){
+      $('#search').keyup(function(){
+          var searchField = $('#search').val();
+          var regex = new RegExp(searchField, "i");
+          var output = '<p>';
+          var count = 1;
+          $.getJSON('/items.json', function(data) {
+            $.each(data, function(key, val){
+              for (var x = 0; x < val.length; x ++ ) {
+              if ((val[x].name.search(regex) != -1) || (val[x].description.search(regex) != -1)) {
+                output += '<h4>' + val[x].name + '</h4>';
+                output += '<p>' + val[x].description + '</p>'
+                if(count%2 == 0){
+                  output += '</p><p>'
+                }
+                count++;
+              }
+            }
+            });
+            output += '</p>';
+            $('#results').html(output);
+          });
+      });
+    });
+// ]]></script>
 {% endblock %}
 {% block content %}
       <div class="row">
@@ -31,6 +57,24 @@
         </div>
         <div class="col-md-10">
           <strong>ITEMS</strong>
+          <div class="row">
+            <div class="col-md-4">
+              <form role="form">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search" placeholder="Search">
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="panel panel-default">
+                <div class="panel-body">
+                  <div id="results"></div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="row">
             {% for i in items %}
             <div class="col-md-3">

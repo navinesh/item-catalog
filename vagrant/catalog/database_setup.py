@@ -29,8 +29,8 @@ class Category(Base):
     def serialize(self):
         """Return data in serializeable format"""
         return {
-            'category-id': self.id,
-            'category-name': self.name,
+            'id': self.id,
+            'name': self.name,
         }
 
 
@@ -54,8 +54,8 @@ class Item(Base):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'category-id': self.category_id,
-            'image-name': self.url,
+            'category_id': self.category_id,
+            'image_name': self.url,
         }
 
 

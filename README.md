@@ -4,6 +4,8 @@ Python web application that provides a list of items within a variety of categor
 It integrates Google and Facebook third party user registration and authentication.
 Authenticated users have the ability to post, edit, and delete their own categories and items.
 
+Instant items search function using jQuery AJAX and JSON
+
 ##Required Libraries and Dependencies
 * Vagrant and VirtualBox - For installing the Vagrant VM https://www.udacity.com/wiki/ud197/install-vagrant
 
@@ -39,6 +41,7 @@ catalog/
 - Logged-in users can upload/change item image
 - Item images are read from database and displayed on the page
 - Prevents cross-site request forgery on new, edit and delete category and item functions
+- Prevents duplicate categories
 
 ##Creator
 Navinesh Chand

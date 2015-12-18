@@ -680,7 +680,7 @@ def catalogJSON():
             itemList.append(i.serialize)
         category['items'] = itemList
         categoryList.append(category)
-    return jsonify(Categories=[categoryList])
+    return jsonify(Categories=categoryList)
 
 
 # JSON categories view

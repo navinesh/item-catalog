@@ -7,7 +7,12 @@ Authenticated users have the ability to post, edit, and delete their own categor
 Instant items search function using jQuery AJAX and JSON
 
 ##Required Libraries and Dependencies
-* Vagrant and VirtualBox - For installing the Vagrant VM https://www.udacity.com/wiki/ud197/install-vagrant
+* Vagrant and VirtualBox - For installing the Vagrant VM, including all the packages https://www.udacity.com/wiki/ud197/install-vagrant
+
+* Python 2.7
+* Flask microframework 0.9
+* PostgreSQL 9.3.10
+* SQLAlchemy
 
 **What's included**
 

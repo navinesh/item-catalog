@@ -361,7 +361,7 @@ def newCategory():
     if request.method == 'POST':
         name=request.form['name']
         for c in categories:
-            if c.name == name:
+            if c.name.lower() == name.lower():
                 response = make_response(json.dumps(
                     'A category with that name exists in the database!'), 401)
                 response.headers['Content-Type'] = 'application/json'

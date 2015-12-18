@@ -356,6 +356,17 @@ def newCategory():
                 response.headers['Content-Type'] = 'application/json'
                 return response
 
+    # prevents duplicate category
+    categories = session.query(Category).all()
+    if request.method == 'POST':
+        name=request.form['name']
+        for c in categories:
+            if c.name == name:
+                response = make_response(json.dumps(
+                    'A category with that name exists in the database!'), 401)
+                response.headers['Content-Type'] = 'application/json'
+                return response
+
     # fetches form data
     if request.method == 'POST':
         newCategory = Category(
@@ -439,7 +450,7 @@ def deleteCategory(category_id):
     if request.method == 'POST':
         session.delete(deleteCategory)
         session.commit()
-        flash('Categiry %s successfully deleted' % (deleteCategory.name))
+        flash('Category %s successfully deleted' % (deleteCategory.name))
         return redirect(url_for('showCategories'))
     else:
         # retrieves anti-forgery state token from session

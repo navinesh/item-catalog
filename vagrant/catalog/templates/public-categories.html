@@ -52,7 +52,7 @@
           <strong>CATEGORIES</strong>
           <ul class="nav nav-pills nav-stacked">
             {% for c in categories %}
-            <li><a href='{{url_for('showItems', category_id=c.id)}}'>{{ c.name }}</a></li>
+            <li><a href='{{url_for('show_items', category_id=c.id)}}'>{{ c.name }}</a></li>
             {% endfor %}
           </ul>
         </div>
@@ -76,7 +76,7 @@
             {% for i in items %}
             <div class="col-md-3">
               {% for c in categories %} {% if c.id == i.category_id %}
-              <a href='{{url_for('showItem', category_id=c.id, items_id=i.id)}}'>
+              <a href='{{url_for('show_item', category_id=c.id, items_id=i.id)}}'>
               {% endif %}
               {% endfor %}
                 <div class="panel panel-default">

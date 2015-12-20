@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $("button").click(function() {
+          $.ajax({
+            dataType: "json",
+            url: "/items.json",
+            success: function(result) {
+              $.each(result, function(i, item) {
+                //alert(JSON.stringify(item));
+                for (var i = 0; i < item.length; i ++ ) {
+                  $("div").append(item[i].id + "</br>"
+                  + item[i].name + "</br>"
+                  + item[i].description + "</br>"
+                  + "<br></br>");
+                }
+              });
+            }
+          });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div id="div">
+      <h2>Get JSON</h2>
+    </div>
+    <button>Get Content</button>
+  </body>
+</html>

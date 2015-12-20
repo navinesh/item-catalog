@@ -48,7 +48,7 @@
       </div>
       <div class="row">
         <div class="col-md-offset-10 col-md-2">
-          <a class="btn btn-custom" href='{{url_for('newCategory')}}' role="button">Create new category</a>
+          <a class="btn btn-custom" href='{{url_for('new_category')}}' role="button">Create new category</a>
         </div>
       </div>
       <div class="row">
@@ -56,7 +56,7 @@
           <strong>CATEGORIES</strong>
           <ul class="nav nav-pills nav-stacked">
             {% for c in categories %}
-            <li><a href='{{url_for('showItems', category_id=c.id)}}'>{{ c.name }}</a></li>
+            <li><a href='{{url_for('show_items', category_id=c.id)}}'>{{ c.name }}</a></li>
             {% endfor %}
           </ul>
         </div>
@@ -80,7 +80,7 @@
             {% for i in items %}
             <div class="col-md-3">
               {% for c in categories %} {% if c.id == i.category_id %}
-              <a href='{{url_for('showItem', category_id=c.id, items_id=i.id)}}'>
+              <a href='{{url_for('show_item', category_id=c.id, items_id=i.id)}}'>
               {% endif %}
               {% endfor %}
                 <div class="panel panel-default">

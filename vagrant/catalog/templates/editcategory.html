@@ -15,7 +15,7 @@
             <p class="text-center">
               <strong>Edit category</strong>
             </p>
-            <form class='form-horizontal' method='post' action='{{url_for('editCategory', category_id=i.id)}}'>
+            <form class='form-horizontal' method='post' action='{{url_for('edit_category', category_id=i.id)}}'>
               <div class="form-group has-feedback">
                 <label for="name" class="control-label col-md-4">
                   Name:
@@ -26,12 +26,12 @@
               </div>
               <div class="form-group">
                 <input type="hidden" name="state" id="state" value="{{ STATE }}">
-              </div>              
+              </div>
               <div class="form-group">
                 <button type="submit" class="btn btn-primary col-xs-offset-1 col-xs-10 col-md-offset-3 col-md-6">Edit</button>
               </div>
               <div class="form-group">
-                <a href='{{url_for('showItems', category_id=i.id)}}' class='btn btn-warning col-xs-offset-1 col-xs-10 col-md-offset-3 col-md-6' role='button'>Cancel</a>
+                <a href='{{url_for('show_items', category_id=i.id)}}' class='btn btn-warning col-xs-offset-1 col-xs-10 col-md-offset-3 col-md-6' role='button'>Cancel</a>
               </div>
             </form>
           </div>

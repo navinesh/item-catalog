@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script>
+      $(window).load(function(){
+        $('#search').keyup(function(){
+            var searchField = $('#search').val();
+            var regex = new RegExp(searchField, "i");
+            var output = '<p>';
+            $.getJSON('/items.json', function(data) {
+              $.each(data, function(key, val){
+                for (var x = 0; x < val.length; x ++ ) {
+                if ((val[x].name.search(regex) != -1) || (val[x].description.search(regex) != -1)) {
+                  output += '<h5>' + val[x].name + '</h5>';
+                  output += '<p>' + val[x].description + '</p>'
+                }
+              }
+              });
+                $('#results').html(output);
+            });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <form role="form">
+            <div class="form-group">
+              <input type="text" class="form-control" id="search" placeholder="Instant search">
+            </div>
+    </form>
+<div id="results"></div>
+  </body>
+</html>

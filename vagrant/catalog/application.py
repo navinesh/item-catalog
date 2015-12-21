@@ -9,6 +9,9 @@ from flask import session as login_session
 import random
 import string
 
+# Import SeaSurf Flask extension for preventing cross-site request forgery
+from flask.ext.seasurf import SeaSurf
+
 # Libaries to handle code sent from call-back method
 # create flow object from client secret json file which stores client-id,
 # client-secret, other o-auth paramaters
@@ -35,6 +38,7 @@ UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
+csrf = SeaSurf(app)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # Limit image upload payload to 2MB
 app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
@@ -45,39 +49,35 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
-def csrf_token():
-    """Creates anti-forgery state token and stores it in session
-    for later verification."""
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits)
-                    for x in xrange(32))
-    login_session['state'] = state
-    return state
+# Helper functions
+def login_required(f):
+    """Checks for any logged-in user"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in login_session:
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def allowed_file(filename):
+    """Check if an image extension is allowed."""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
 @app.route('/login')
 def show_login():
-    """Passes anti-forgery state token saved in session to login template."""
-
-    # Google and Facebook login functions will verify this token against
-    # the token transmitted with the form data to prevent cross-site request
-    # forgery.
-    state = csrf_token()
-    # render login template
-    return render_template('login.html', STATE=state)
+    """Render login template."""
+    return render_template('login.html')
 
 
+# Login and logout functions
 @app.route('/gconnect', methods=['POST'])
 def google_connect():
     """Google login.
 
     Handle calls sent back by Google sign-in call-back method."""
-
-    # verify value of state to prevent cross-site request forgery
-    if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state paramater'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-
     code = request.data  # obtain authorization code
 
     try:
@@ -199,11 +199,6 @@ def google_disconnect():
 def facebook_connect():
     """Facebook login."""
 
-    # verify value of state to prevent cross-site request forgery
-    if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state paramater.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
     access_token = request.data
 
     # exchange short-lived token for a long-lived token
@@ -339,6 +334,7 @@ def get_user_id(email):
         None
 
 
+# Views
 @app.route('/')
 @app.route('/categories/')
 def show_categories():
@@ -356,20 +352,9 @@ def show_categories():
 
 
 @app.route('/categories/new/', methods=['GET', 'POST'])
+@login_required
 def new_category():
     """Creates new category."""
-
-    # checks for any logged-in user
-    if 'username' not in login_session:
-        return redirect('/login')
-
-    # prevents cross-site request forgery
-    if request.method == 'POST' and request.form['state']:
-        if request.form['state'] != login_session['state']:
-            response = make_response(json.dumps(
-                'Invalid state paramater'), 401)
-            response.headers['Content-Type'] = 'application/json'
-            return response
 
     # prevents duplicate category
     categories = session.query(Category).all()
@@ -395,29 +380,17 @@ def new_category():
 
 
 @app.route('/categories/<int:category_id>/edit/', methods=['GET', 'POST'])
+@login_required
 def edit_category(category_id):
     """Edits category.
 
     Args:
         category_id (int): the category id to edit
     """
-    # checks for any logged-in user
-    if 'username' not in login_session:
-        return redirect('/login')
-
-    # prevents cross-site request forgery
-    if request.method == 'POST' and request.form['state']:
-        if request.form['state'] != login_session['state']:
-            response = make_response(json.dumps(
-                'Invalid state paramater'), 401)
-            response.headers['Content-Type'] = 'application/json'
-            return response
-
     editCategory = session.query(Category).filter_by(id=category_id).one()
-    creator = get_user_info(editCategory.user_id)  # get creator info
 
     # fetches form data and verifies if logged-in user created this category
-    if request.method == 'POST' and is_authorised(category.user_id, login_session['user_id']):
+    if request.method == 'POST' and is_authorised(login_session['user_id'], creator.id):
         if request.form['name']:
             editCategory.name = request.form['name']
         session.add(editCategory)
@@ -425,43 +398,28 @@ def edit_category(category_id):
         flash('Category %s successfully edited' % (editCategory.name))
         return redirect(url_for('show_categories'))
     else:
-        return render_template('editcategory.html', i=editCategory,
-                               creator=creator)
+        return render_template('editcategory.html', i=editCategory)
 
 
 @app.route('/categories/<int:category_id>/delete/', methods=['GET', 'POST'])
+@login_required
 def delete_category(category_id):
     """Deletes category.
 
     Args:
         category_id (int): the category id to delete
     """
-    # checks for any logged-in user
-    if 'username' not in login_session:
-        return redirect('/login')
-
-    # prevents cross-site request forgery
-    if request.method == 'POST' and request.form['state']:
-        if request.form['state'] != login_session['state']:
-            response = make_response(json.dumps(
-                'Invalid state paramater'), 401)
-            response.headers['Content-Type'] = 'application/json'
-            return response
-
     deleteCategory = session.query(Category).filter_by(id=category_id).one()
     creator = get_user_info(deleteCategory.user_id)  # get creator info
 
     # fetches form data and verifies if logged-in user created this category
-    if request.method == 'POST' and is_authorised(category.user_id, login_session['user_id']):
+    if request.method == 'POST' and is_authorised(deleteCategory.user_id, login_session['user_id']):
         session.delete(deleteCategory)
         session.commit()
         flash('Category %s successfully deleted' % (deleteCategory.name))
         return redirect(url_for('show_categories'))
     else:
-        # retrieves anti-forgery state token from session
-        state = csrfToken()
-        return render_template('deletecategory.html', i=deleteCategory,
-                               creator=creator, STATE=state)
+        return render_template('deletecategory.html', i=deleteCategory)
 
 
 @app.route('/categories/<int:category_id>/<items_id>/')
@@ -511,26 +469,14 @@ def show_items(category_id):
 
 
 @app.route('/categories/<int:category_id>/items/new/', methods=['GET', 'POST'])
+@login_required
 def new_item(category_id):
     """Creates a new item for a particular category.
 
     Args:
         category_id (int): the category id to create item for
     """
-    # checks for any logged-in user
-    if 'username' not in login_session:
-        return redirect('/login')
-
-    # prevents cross-site request forgery
-    if request.method == 'POST' and request.form['state']:
-        if request.form['state'] != login_session['state']:
-            response = make_response(json.dumps(
-                'Invalid state paramater'), 401)
-            response.headers['Content-Type'] = 'application/json'
-            return response
-
     category = session.query(Category).filter_by(id=category_id).first()
-    creator = get_user_info(category.user_id)  # get creator info
 
     # fetches form data and verifies if logged-in user created this category
     if request.method == 'POST' and is_authorised(category.user_id, login_session['user_id']):
@@ -551,11 +497,12 @@ def new_item(category_id):
         return redirect(url_for('show_items', category_id=category_id))
     else:
         return render_template('newitem.html', category_id=category_id,
-                               category_name=category.name, creator=creator)
+                               category_name=category.name)
 
 
 @app.route('/categories/<int:category_id>/<items_id>/edit/',
            methods=['GET', 'POST'])
+@login_required
 def edit_item(category_id, items_id):
     """Edit an item of a particular category.
 
@@ -563,25 +510,13 @@ def edit_item(category_id, items_id):
         items_id (int): the item id to edit
         category_id (int): the category id to filter query
     """
-    # checks for any logged-in user
-    if 'username' not in login_session:
-        return redirect('/login')
-
-    # prevents cross-site request forgery
-    if request.method == 'POST' and request.form['state']:
-        if request.form['state'] != login_session['state']:
-            response = make_response(json.dumps(
-                'Invalid state paramater'), 401)
-            response.headers['Content-Type'] = 'application/json'
-            return response
-
     categories = session.query(Category).all()
     category = session.query(Category).filter_by(id=category_id).first()
-    creator = get_user_info(category.user_id)  # get creator info
     editItem = session.query(Item).filter_by(id=items_id).one()
 
-    # fetches form data and verifies if logged-in user created this category
-    if request.method == 'POST' and is_authorised(category.user_id, login_session['user_id']):
+    # fetches form data and verifies if logged-in user created this
+    # category
+    if request.method == 'POST' and is_authorised(login_session['user_id'], category.user_id):
         if request.form['name']:
             editItem.name = request.form['name']
         if request.form['description']:
@@ -599,12 +534,12 @@ def edit_item(category_id, items_id):
         return redirect(url_for('show_items', category_id=category_id))
     else:
         return render_template('edititem.html', category=category,
-                               i=editItem, categories=categories,
-                               creator=creator)
+                               i=editItem, categories=categories)
 
 
 @app.route('/categories/<int:category_id>/<items_id>/delete/',
            methods=['GET', 'POST'])
+@login_required
 def delete_item(category_id, items_id):
     """Delete an item of a particular category.
 
@@ -612,20 +547,7 @@ def delete_item(category_id, items_id):
         items_id (int): the item id to delete
         category_id (int): the category id to filter query
     """
-    # checks for any logged-in user
-    if 'username' not in login_session:
-        return redirect('/login')
-
-    # prevents cross-site request forgery
-    if request.method == 'POST' and request.form['state']:
-        if request.form['state'] != login_session['state']:
-            response = make_response(json.dumps(
-                'Invalid state paramater'), 401)
-            response.headers['Content-Type'] = 'application/json'
-            return response
-
     category = session.query(Category).filter_by(id=category_id).first()
-    creator = get_user_info(category.user_id)  # get creator info
     deleteItem = session.query(Item).filter_by(id=items_id).one()
 
     # fetches form data and verifies if logged-in user created this category
@@ -635,10 +557,8 @@ def delete_item(category_id, items_id):
         flash('Item %s successfully deleted' % (deleteItem.name))
         return redirect(url_for('show_items', category_id=category_id))
     else:
-        # retrieves anti-forgery state token from session
-        state = csrfToken()
         return render_template('deleteitem.html', category_id=category_id,
-                               i=deleteItem, creator=creator, STATE=state)
+                               i=deleteItem)
 
 
 # Image functions
@@ -675,26 +595,20 @@ def edit_image(filename, category_id, items_id):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 
-def is_authorised(creator_user_id, session_user_id):
-    """Verifies if logged-in user created this category
+def is_authorised(session_user_id, creator_user_id):
+    """Verifies if logged-in user created the category
 
    Args:
-       creator_user_id: the user id from the database
        session_user_id: the user id from session
+       creator_user_id: the user id from the database
     """
-    if creator_user_id != session_user_id:
+    if session_user_id != creator_user_id:
         return "<script>function myFunction() {alert\
         ('You are not authorised to delete this item!');}\
         setTimeout(function() {window.location.href = '/categories';}, 2000);\
         </script><body onload='myFunction()'' >"
     else:
         return True
-
-
-def allowed_file(filename):
-    """Check if an image extension is allowed."""
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
 # XML API to view sports catalog

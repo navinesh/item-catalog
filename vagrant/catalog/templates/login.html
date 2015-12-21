@@ -49,6 +49,37 @@
         </div>
       </div>
     </div>
+    <!--Acquiring the CSRF token -->
+    <script>
+    // using jQuery
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+    function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+    </script>
     <!--Google login-->
     <script>
       function signInCallback(authResult) {
@@ -60,7 +91,7 @@
           // redirect back to the home page
           $.ajax({
             type: 'POST',
-            url: '/gconnect?state={{STATE}}',
+            url: '/gconnect',
             processData: false,
             contentType: 'application/octet-stream; charset=utf-8',
             data: authResult['code'],
@@ -109,12 +140,12 @@
           console.log('Successful login for: ' + response.name);
          $.ajax({
           type: 'POST',
-          url: '/fbconnect?state={{STATE}}',
+          url: '/fbconnect',
           processData: false,
           data: access_token,
           contentType: 'application/octet-stream; charset=utf-8',
           success: function(result) {
-            // check if login was successful 
+            // check if login was successful
             if (result) {
               $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
             // redirect to categories page 4 seconds later

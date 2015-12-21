@@ -9,10 +9,12 @@ Instant items search function using jQuery AJAX and JSON
 ##Required Libraries and Dependencies
 * Vagrant and VirtualBox - For installing the Vagrant VM, including all the packages https://www.udacity.com/wiki/ud197/install-vagrant
 
+If not using Vagrant VM from the above link, the following packages are required
 * Python 2.7
 * Flask microframework 0.9
 * PostgreSQL 9.3.10
 * SQLAlchemy
+* Flask-SeaSurf
 
 **What's included**
 
@@ -37,9 +39,13 @@ catalog/
 3. Using the terminal, change directory to **vagrant** (cd vagrant), then type `vagrant up` to launch your virtual machine
 4. Once it is up and running, type `vagrant ssh` to log into it
 5. Change directory to **vagrant/catalog** (cd /vagrant/catalog)
-6. Run the command `psql -f db.sql` to create the database
-7. Run the command `python data.py` to create dummy data
-8. Run the command `python application.py` to run the application
+6. Install Flask-SeaSurf with one of the following commands:
+- `easy_install flask-seasurf`
+or
+- `pip install flask-seasurf`
+7. Run the command `psql -f db.sql` to create the database
+8. Run the command `python data.py` to create dummy data
+9. Run the command `python application.py` to run the application
 
 ##Extra Credit Description
 - JSON and XML APIs

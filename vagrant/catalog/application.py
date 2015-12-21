@@ -76,7 +76,6 @@ def show_login():
 @app.route('/gconnect', methods=['POST'])
 def google_connect():
     """Google login.
-
     Handle calls sent back by Google sign-in call-back method."""
     code = request.data  # obtain authorization code
 
@@ -168,7 +167,6 @@ def google_connect():
 @app.route('/gdisconnect')
 def google_disconnect():
     """Google logout.
-
     Logs out user, revokes users' token and
     resets their login session."""
 
@@ -261,7 +259,6 @@ def facebook_connect():
 @app.route('/fbdisconnect')
 def facebook_disconnect():
     """Facebook logout.
-
     Logs out user, revokes users' token and
     resets their login session."""
     facebook_id = login_session['facebook_id']
@@ -298,7 +295,6 @@ def logout():
 
 def create_user(login_session):
     """Fetches logged-in user info to create new user in database.
-
     Args:
         login_session: the period of activity between a user logging in and
         logging out
@@ -313,7 +309,6 @@ def create_user(login_session):
 
 def get_user_info(user_id):
     """Retrieves user object associated with the user ID.
-
     Args:
         user_id (int): the user id to filter query
     """
@@ -323,7 +318,6 @@ def get_user_info(user_id):
 
 def get_user_id(email):
     """Retrieves user ID number from the database.
-
     Args:
         user_id (int): the user id to retrieve
     """
@@ -383,7 +377,6 @@ def new_category():
 @login_required
 def edit_category(category_id):
     """Edits category.
-
     Args:
         category_id (int): the category id to edit
     """
@@ -405,7 +398,6 @@ def edit_category(category_id):
 @login_required
 def delete_category(category_id):
     """Deletes category.
-
     Args:
         category_id (int): the category id to delete
     """
@@ -425,7 +417,6 @@ def delete_category(category_id):
 @app.route('/categories/<int:category_id>/<items_id>/')
 def show_item(items_id, category_id):
     """Retrieves details of single item.
-
     Args:
         items_id (int): the item id to filter query
         category_id (int): the category id to filter query
@@ -449,7 +440,6 @@ def show_item(items_id, category_id):
 @app.route('/categories/<int:category_id>/items/')
 def show_items(category_id):
     """Retrieves all items in each category.
-
     Args:
         category_id (int): the category id to filter query
     """
@@ -472,7 +462,6 @@ def show_items(category_id):
 @login_required
 def new_item(category_id):
     """Creates a new item for a particular category.
-
     Args:
         category_id (int): the category id to create item for
     """
@@ -505,7 +494,6 @@ def new_item(category_id):
 @login_required
 def edit_item(category_id, items_id):
     """Edit an item of a particular category.
-
     Args:
         items_id (int): the item id to edit
         category_id (int): the category id to filter query
@@ -542,7 +530,6 @@ def edit_item(category_id, items_id):
 @login_required
 def delete_item(category_id, items_id):
     """Delete an item of a particular category.
-
     Args:
         items_id (int): the item id to delete
         category_id (int): the category id to filter query
@@ -566,7 +553,6 @@ def delete_item(category_id, items_id):
 @app.route('/categories/<filename>/')
 def show_image_home(filename):
     """Serves uploaded images for home page view.
-
     Args:
         filename (string): the image name to serve
     """
@@ -576,7 +562,6 @@ def show_image_home(filename):
 @app.route('/categories/<int:category_id>/items/<filename>/')
 def show_image(filename, category_id):
     """Serves uploaded images for category view.
-
     Args:
         filename (string): the image name to serve
         category_id (int): the category id to filter query
@@ -588,7 +573,6 @@ def show_image(filename, category_id):
 @app.route('/categories/<int:category_id>/<items_id>/edit/<filename>')
 def edit_image(filename, category_id, items_id):
     """Serves uploaded image for editing.
-
     Args:
         filename (string): the image name to edit
     """
@@ -597,7 +581,6 @@ def edit_image(filename, category_id, items_id):
 
 def is_authorised(session_user_id, creator_user_id):
     """Verifies if logged-in user created the category
-
    Args:
        session_user_id: the user id from session
        creator_user_id: the user id from the database

@@ -4,10 +4,13 @@ Python web application that provides a list of items within a variety of categor
 It integrates Google and Facebook third party user registration and authentication.
 Authenticated users have the ability to post, edit, and delete their own categories and items.
 
-Instant items search function using jQuery AJAX and JSON
+Instant items search function using jQuery AJAX and JSON.
+
+Flask-SeaSurf is used to prevent cross-site request forgery (CSRF).
 
 ##Required Libraries and Dependencies
 * Vagrant and VirtualBox - For installing the Vagrant VM, including all the packages https://www.udacity.com/wiki/ud197/install-vagrant
+* Flask-SeaSurf
 
 If not using Vagrant VM from the above link, the following packages are required
 * Python 2.7

@@ -66,6 +66,53 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
+def create_user(login_session):
+    """Fetches logged-in user info to create new user in database.
+    Args:
+        login_session: the period of activity between a user logging in and
+        logging out
+    """
+    newUser = User(name=login_session['username'], email=login_session[
+                   'email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+
+def get_user_info(user_id):
+    """Retrieves user object associated with the user ID.
+    Args:
+        user_id (int): the user id to filter query
+    """
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def get_user_id(email):
+    """Retrieves user ID number from the database.
+    Args:
+        user_id (int): the user id to retrieve
+    """
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        None
+
+
+def is_authorised(creator_user_id, session_user_id):
+    """Verifies if logged-in user created the category
+    Args:
+       creator_user_id: the user id from the database
+       session_user_id: the user id from session
+    """
+    if creator_user_id != session_user_id:
+        return False
+    else:
+        return True
+
+
 @app.route('/login')
 def show_login():
     """Render login template."""
@@ -73,6 +120,7 @@ def show_login():
 
 
 # Login and logout functions
+@csrf.exempt
 @app.route('/gconnect', methods=['POST'])
 def google_connect():
     """Google login.
@@ -293,41 +341,6 @@ def logout():
         return redirect(url_for('show_categories'))
 
 
-def create_user(login_session):
-    """Fetches logged-in user info to create new user in database.
-    Args:
-        login_session: the period of activity between a user logging in and
-        logging out
-    """
-    newUser = User(name=login_session['username'], email=login_session[
-                   'email'], picture=login_session['picture'])
-    session.add(newUser)
-    session.commit()
-    user = session.query(User).filter_by(email=login_session['email']).one()
-    return user.id
-
-
-def get_user_info(user_id):
-    """Retrieves user object associated with the user ID.
-    Args:
-        user_id (int): the user id to filter query
-    """
-    user = session.query(User).filter_by(id=user_id).one()
-    return user
-
-
-def get_user_id(email):
-    """Retrieves user ID number from the database.
-    Args:
-        user_id (int): the user id to retrieve
-    """
-    try:
-        user = session.query(User).filter_by(email=email).one()
-        return user.id
-    except:
-        None
-
-
 # Views
 @app.route('/')
 @app.route('/categories/')
@@ -382,8 +395,13 @@ def edit_category(category_id):
     """
     editCategory = session.query(Category).filter_by(id=category_id).one()
 
-    # fetches form data and verifies if logged-in user created this category
-    if request.method == 'POST' and is_authorised(login_session['user_id'], creator.id):
+    # verifies if logged-in user created this category
+    if not is_authorised(editCategory.user_id, login_session['user_id']):
+        flash("You're not authorised to edit this category!")
+        return redirect(url_for('show_categories'))
+
+    # fetches form data
+    if request.method == 'POST':
         if request.form['name']:
             editCategory.name = request.form['name']
         session.add(editCategory)
@@ -402,10 +420,14 @@ def delete_category(category_id):
         category_id (int): the category id to delete
     """
     deleteCategory = session.query(Category).filter_by(id=category_id).one()
-    creator = get_user_info(deleteCategory.user_id)  # get creator info
 
-    # fetches form data and verifies if logged-in user created this category
-    if request.method == 'POST' and is_authorised(deleteCategory.user_id, login_session['user_id']):
+    # verifies if logged-in user created this category
+    if not is_authorised(deleteCategory.user_id, login_session['user_id']):
+        flash("You're not authorised to delete this category!")
+        return redirect(url_for('show_categories'))
+
+    # fetches form data
+    if request.method == 'POST':
         session.delete(deleteCategory)
         session.commit()
         flash('Category %s successfully deleted' % (deleteCategory.name))
@@ -467,8 +489,13 @@ def new_item(category_id):
     """
     category = session.query(Category).filter_by(id=category_id).first()
 
-    # fetches form data and verifies if logged-in user created this category
-    if request.method == 'POST' and is_authorised(category.user_id, login_session['user_id']):
+    # verifies if logged-in user created this category
+    if not is_authorised(category.user_id, login_session['user_id']):
+        flash("You're not authorised to create new item for this category!")
+        return redirect(url_for('show_categories'))
+
+    # fetches form data
+    if request.method == 'POST':
         file = request.files['file']  # check if an image was posted
         if file and allowed_file(file.filename):  # check extension
             filename = secure_filename(file.filename)  # return secure version
@@ -502,9 +529,13 @@ def edit_item(category_id, items_id):
     category = session.query(Category).filter_by(id=category_id).first()
     editItem = session.query(Item).filter_by(id=items_id).one()
 
-    # fetches form data and verifies if logged-in user created this
-    # category
-    if request.method == 'POST' and is_authorised(login_session['user_id'], category.user_id):
+    # verifies if logged-in user created this item
+    if not is_authorised(editItem.user_id, login_session['user_id']):
+        flash("You're not authorised to edit this item!")
+        return redirect(url_for('show_categories'))
+
+    # fetches form data
+    if request.method == 'POST':
         if request.form['name']:
             editItem.name = request.form['name']
         if request.form['description']:
@@ -537,8 +568,13 @@ def delete_item(category_id, items_id):
     category = session.query(Category).filter_by(id=category_id).first()
     deleteItem = session.query(Item).filter_by(id=items_id).one()
 
-    # fetches form data and verifies if logged-in user created this category
-    if request.method == 'POST' and is_authorised(category.user_id, login_session['user_id']):
+    # verifies if logged-in user created this item
+    if not is_authorised(deleteItem.user_id, login_session['user_id']):
+        flash("You're not authorised to delete this item!")
+        return redirect(url_for('show_categories'))
+
+    # fetches form data
+    if request.method == 'POST':
         session.delete(deleteItem)
         session.commit()
         flash('Item %s successfully deleted' % (deleteItem.name))
@@ -577,21 +613,6 @@ def edit_image(filename, category_id, items_id):
         filename (string): the image name to edit
     """
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-
-def is_authorised(session_user_id, creator_user_id):
-    """Verifies if logged-in user created the category
-   Args:
-       session_user_id: the user id from session
-       creator_user_id: the user id from the database
-    """
-    if session_user_id != creator_user_id:
-        return "<script>function myFunction() {alert\
-        ('You are not authorised to delete this item!');}\
-        setTimeout(function() {window.location.href = '/categories';}, 2000);\
-        </script><body onload='myFunction()'' >"
-    else:
-        return True
 
 
 # XML API to view sports catalog

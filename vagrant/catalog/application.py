@@ -368,10 +368,8 @@ def new_category():
         name = request.form['name']
         for c in categories:
             if c.name.lower() == name.lower():
-                response = make_response(json.dumps(
-                    'A category with that name exists in the database!'), 409)
-                response.headers['Content-Type'] = 'application/json'
-                return response
+                flash("A category with that name exists in the database!")
+                return redirect(url_for('show_categories'))
 
     # fetches form data
     if request.method == 'POST':

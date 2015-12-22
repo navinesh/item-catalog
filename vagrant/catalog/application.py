@@ -102,7 +102,7 @@ def get_user_id(email):
 
 
 def is_authorised(creator_user_id, session_user_id):
-    """Verifies if logged-in user created the category
+    """Verifies if logged-in user created the category/item
     Args:
        creator_user_id: the user id from the database
        session_user_id: the user id from session

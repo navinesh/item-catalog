@@ -562,7 +562,6 @@ def delete_item(category_id, items_id):
         items_id (int): the item id to delete
         category_id (int): the category id to filter query
     """
-    category = session.query(Category).filter_by(id=category_id).first()
     deleteItem = session.query(Item).filter_by(id=items_id).one()
 
     # verifies if logged-in user created this item

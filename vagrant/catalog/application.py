@@ -572,6 +572,7 @@ def delete_item(category_id, items_id):
 
     # fetches form data
     if request.method == 'POST':
+        os.remove(os.path.join(app.config['UPLOAD_FOLDER'], deleteItem.url))
         session.delete(deleteItem)
         session.commit()
         flash('Item %s successfully deleted' % (deleteItem.name))

@@ -120,7 +120,6 @@ def show_login():
 
 
 # Login and logout functions
-@csrf.exempt
 @app.route('/gconnect', methods=['POST'])
 def google_connect():
     """Google login.

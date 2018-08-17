@@ -1,4 +1,4 @@
-#Item catalog
+# Item catalog
 Python web application that provides a list of items within a variety of categories.
 
 It integrates Google and Facebook third party user registration and authentication.
@@ -8,7 +8,7 @@ Instant items search function using jQuery AJAX and JSON.
 
 Flask-SeaSurf is used to prevent cross-site request forgery (CSRF).
 
-##Required Libraries and Dependencies
+## Required Libraries and Dependencies
 * Vagrant and VirtualBox - For installing the Vagrant VM, including all the packages https://www.udacity.com/wiki/ud197/install-vagrant
 * Flask-SeaSurf
 
@@ -36,7 +36,7 @@ catalog/
 ├──uploads/
 ```
 
-##How to Run the Project
+## How to Run the Project
 1. Fork https://github.com/navinesh/Item-catalog
 2. Clone the newly forked repository to your computer
 3. Using the terminal, change directory to **vagrant** (cd vagrant), then type `vagrant up` to launch your virtual machine
@@ -47,14 +47,14 @@ catalog/
 8. Run the command `python data.py` to create dummy data
 9. Run the command `python application.py` to run the application
 
-##Extra Credit Description
+## Extra Credit Description
 - JSON and XML APIs
 - Logged-in users can upload/change item image
 - Item images are read from database and displayed on the page
 - Prevents cross-site request forgery on new, edit and delete category and item functions
 - Prevents duplicate categories
 
-##Creator
+## Creator
 Navinesh Chand
 * https://twitter.com/navinesh
 * https://github.com/navinesh
